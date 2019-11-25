@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "79671658140",
+    "firebase_url": "https://drawable-ea1b2.firebaseio.com",
+    "project_id": "drawable-ea1b2",
+    "storage_bucket": "drawable-ea1b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79671658140:android:df41374921c81afc22cf59",
+        "android_client_info": {
+          "package_name": "com.example.pypoh.drawable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "79671658140-4k686th36me8qba6asgno2o1hnpmun3v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pypoh.drawable",
+            "certificate_hash": "4f816667fb8b4680f276703cddf1de0e06e91924"
+          }
+        },
+        {
+          "client_id": "79671658140-qheas2dqtaanntq83gjhkip2dddsngbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSQQ-9cAq5TJaeAUj0P8rr-BJV-34xPTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "79671658140-qheas2dqtaanntq83gjhkip2dddsngbu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

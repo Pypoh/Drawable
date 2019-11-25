@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Auth.AuthFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/auth_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="56dp"
+            android:layout_marginTop="56dp"
+            android:layout_marginRight="56dp"
+            android:background="@drawable/rounded_button_solid_primary"
+            android:text="Login"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/auth_logo"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/auth_regist_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="56dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="56dp"
+            android:background="@drawable/rounded_button_border_primary"
+            android:text="Register"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@id/auth_regist_text"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/auth_guest_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="56dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_button_border_primary"
+            android:text="Play as Guest"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@id/auth_guest_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <ImageView
+            android:id="@+id/auth_logo"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:src="@color/semi_black"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/auth_guest_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="------------or------------"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/auth_regist_button"/>
+
+        <TextView
+            android:id="@+id/auth_regist_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="doesn't have an account?"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/auth_login_button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
