@@ -64,7 +64,7 @@
                     android:layout_marginLeft="8dp"
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp"
-                    android:text="Name"
+                    android:text="BattleTag"
                     android:textColor="@color/text_auth"
                     android:textSize="16sp"
                     android:background="@color/white"
@@ -76,12 +76,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="28dp"
-                    android:hint="name"
+                    android:hint="BattleTag"
                     android:textColorHint="@color/semi_black"
                     app:hintTextAppearance="@style/HintTextStyle">
 
                     <EditText
-                        android:id="@+id/edit_name"
+                        android:id="@+id/edit_battletag"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
@@ -134,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="28dp"
-                    android:hint="email"
+                    android:hint="Email"
                     android:textColorHint="@color/semi_black"
                     app:hintTextAppearance="@style/HintTextStyle">
 
@@ -192,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="28dp"
-                    android:hint="password"
+                    android:hint="Password"
                     android:textColorHint="@color/semi_black"
                     app:hintTextAppearance="@style/HintTextStyle"
                     app:passwordToggleEnabled="true">
@@ -252,7 +252,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="28dp"
-                    android:hint="re-type password"
+                    android:hint="Re-type password"
                     android:textColorHint="@color/semi_black"
                     app:hintTextAppearance="@style/HintTextStyle"
                     app:passwordToggleEnabled="true">

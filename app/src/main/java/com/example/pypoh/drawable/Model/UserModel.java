@@ -3,19 +3,18 @@ package com.example.pypoh.drawable.Model;
 import com.google.gson.annotations.SerializedName;
 
 public class UserModel {
-
     @SerializedName("id")
     private String id;
-    @SerializedName("name")
-    private String name;
+    @SerializedName("BattleTag")
+    private String battleTag;
     @SerializedName("email")
     private String email;
     @SerializedName("level")
     private int level;
 
-    public UserModel(String id, String name, String email, int level) {
+    public UserModel(String id, String battleTag, String email, int level) {
         this.id = id;
-        this.name = name;
+        this.battleTag = battleTag;
         this.email = email;
         this.level = level;
     }
@@ -32,12 +31,12 @@ public class UserModel {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getBattleTag() {
+        return battleTag;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.battleTag = name;
     }
 
     public String getEmail() {
@@ -55,6 +54,5 @@ public class UserModel {
     public void setLevel(int level) {
         this.level = level;
     }
-
 
 }

@@ -1,7 +1,5 @@
 package com.example.pypoh.drawable.Auth;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -36,7 +34,7 @@ import java.util.Objects;
 public class RegisterFragment extends Fragment {
 
     TextView textDummyHintName;
-    EditText editName;
+    EditText editBattletag;
     TextView textDummyHintEmail;
     EditText editEmail;
     TextView textDummyHintPassword;
@@ -73,8 +71,8 @@ public class RegisterFragment extends Fragment {
 
 
         textDummyHintName = view.findViewById(R.id.text_dummy_hint_name);
-        editName = view.findViewById(R.id.edit_name);
-        editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        editBattletag = view.findViewById(R.id.edit_battletag);
+        editBattletag.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -87,7 +85,7 @@ public class RegisterFragment extends Fragment {
                     }, 100);
                 } else {
                     // Required to show/hide white background behind floating label during focus change
-                    if (editName.getText().length() > 0)
+                    if (editBattletag.getText().length() > 0)
                         textDummyHintName.setVisibility(View.VISIBLE);
                     else
                         textDummyHintName.setVisibility(View.INVISIBLE);
@@ -169,9 +167,9 @@ public class RegisterFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void signUp(String email, String password) {
-        if(TextUtils.isEmpty(editName.getText().toString())){
+        if(TextUtils.isEmpty(editBattletag.getText().toString())){
             Toast.makeText(getActivity(), "Please Enter Your Name...", Toast.LENGTH_SHORT).show();
-            editName.requestFocus();
+            editBattletag.requestFocus();
             return;
         }
         if(TextUtils.isEmpty(email)){
@@ -197,7 +195,7 @@ public class RegisterFragment extends Fragment {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             user = mAuth.getCurrentUser();
-                            insertUserData(editName.getText().toString(), editEmail.getText().toString());
+                            insertUserData(editBattletag.getText().toString(), editEmail.getText().toString());
                         } else {
                             signUpBtn.setEnabled(true);
                             Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
@@ -206,11 +204,11 @@ public class RegisterFragment extends Fragment {
                 });
     }
 
-    private void insertUserData(String name, String email) {
+    private void insertUserData(String battleTag, String email) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DocumentReference userRef = db.collection("users").document(userId);
 
-        UserModel userModel = new UserModel(userId, name, email, 0);
+        UserModel userModel = new UserModel(userId, battleTag, email, 0);
 
         userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
