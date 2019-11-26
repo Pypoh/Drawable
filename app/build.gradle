@@ -35,4 +35,16 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+    // Circle Image
+    implementation 'de.hdodenhof:circleimageview:3.0.1'
+
+    // Circle Progress
+    implementation 'com.github.Adilhusen:circle-progress-ad-android-:1.0'
+
+    // Circle Indicator
+    implementation 'me.relex:circleindicator:2.1.4'
+
+    // Rounded Image
+    implementation 'com.makeramen:roundedimageview:2.3.0'
 }
