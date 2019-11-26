@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -168,6 +169,27 @@ public class RegisterFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void signUp(String email, String password) {
+        if(TextUtils.isEmpty(editName.getText().toString())){
+            Toast.makeText(getActivity(), "Please Enter Your Name...", Toast.LENGTH_SHORT).show();
+            editName.requestFocus();
+            return;
+        }
+        if(TextUtils.isEmpty(email)){
+            Toast.makeText(getActivity(), "Please Enter Your Email...", Toast.LENGTH_SHORT).show();
+            editEmail.requestFocus();
+            return;
+        }
+        if(TextUtils.isEmpty(password)){
+            Toast.makeText(getActivity(), "Please Enter Your Password...", Toast.LENGTH_SHORT).show();
+            editPassword.requestFocus();
+            return;
+        }
+        if(!password.equals(editRePass.getText().toString())){
+            Toast.makeText(getActivity(), "Password Not Matching...", Toast.LENGTH_SHORT).show();
+            editRePass.requestFocus();
+            return;
+        }
+
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(Objects.requireNonNull(getActivity()), new OnCompleteListener<AuthResult>() {
                     @Override

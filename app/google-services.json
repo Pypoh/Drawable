@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "79671658140-1tf01ss5k0qq9bh71pq72dipqajqu05f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pypoh.drawable",
+            "certificate_hash": "3cbf45cdd9fe2b6ff10ec66dec9a450a4655ff8b"
+          }
+        },
+        {
           "client_id": "79671658140-4k686th36me8qba6asgno2o1hnpmun3v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
