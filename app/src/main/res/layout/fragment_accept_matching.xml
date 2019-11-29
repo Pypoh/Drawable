@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AcceptMatchingFragment"
+    android:background="@color/white">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civ_host"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/men"
+            tools:ignore="MissingConstraints"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="96dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="dummy_host"
+            android:layout_centerHorizontal="true"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:layout_below="@id/civ_host"
+            android:layout_marginTop="20dp"/>
+        <ImageView
+            android:id="@+id/iv_matching"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/ic_close_black_24dp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@color/orange"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civ_opponent"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/men"
+            android:layout_below="@id/iv_matching"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="dummy_host"
+            android:layout_centerHorizontal="true"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:layout_below="@id/civ_opponent"
+            android:layout_marginTop="20dp"/>
+
+    </RelativeLayout>
+
+
+</FrameLayout>

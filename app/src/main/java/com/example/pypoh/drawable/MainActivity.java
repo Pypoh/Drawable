@@ -1,18 +1,29 @@
 package com.example.pypoh.drawable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.pypoh.drawable.MainFragment.BattleFragment;
+import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
+import com.example.pypoh.drawable.Model.NotifModel;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -22,7 +33,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -43,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Utils
     boolean doubleBackToExitPressedOnce = false;
+    private NotificationCompat.Builder mBuilder;
+    public static final String NOTIFICATION_CHANNEL_ID = "10001";
+    private NotificationManager mNotificationManager;
 
     private List<String> allFriend = new ArrayList<>();
 
@@ -88,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
         setFragment(battleFragment);
 
+        checkNotification();
+
     }
 
 //    private void changeIconStateBar(int pathItem, int pathIcon) {
@@ -117,8 +135,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        setOfflineUser();
         tellOthersThatImFuckingOffline();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        setOfflineUser();
     }
 
     @Override
@@ -215,6 +238,68 @@ public class MainActivity extends AppCompatActivity {
             db.collection("users").document(id).collection("friend").document(uid).update("online", false);
         }
     }
+
+    private void checkNotification() {
+        String uid = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(uid).collection("notification").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (queryDocumentSnapshots != null) {
+                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                        NotifModel notifModel = documentSnapshot.toObject(NotifModel.class);
+                        if (notifModel != null) {
+                            // disini munculin notif
+                            pushNotification();
+
+                        }
+                        /*FriendModel friendModel = documentSnapshot.toObject(FriendModel.class);
+                        if (friendModel.isOnline()) {
+                            friendsData.add(friendModel);
+                            Log.d("testDebugFriendList", friendModel.getName());
+                        }*/
+                    }
+                }
+            }
+        });
+    }
+
+    private void pushNotification() {
+        Intent resultIntent = new Intent(this.getApplicationContext(), MatchingActivity.class);
+        resultIntent.putExtra("STATUS_KEY", 1);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this,
+                0, resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_mail_black_24dp);
+        mBuilder.setContentTitle("Battle Invitation")
+                .setContentText("Are you ready?")
+                .setAutoCancel(false)
+                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+                .addAction(R.drawable.ic_check_black_24dp, "Accept", resultPendingIntent);
+
+
+
+        mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.YELLOW);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            assert mNotificationManager != null;
+            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
+            mNotificationManager.createNotificationChannel(notificationChannel);
+        }
+        assert mNotificationManager != null;
+        mNotificationManager.notify(0 /* Request Code */, mBuilder.build());
+    }
+
+
     /*private void setOnline(String userId, String get_battleTag) {
         DocumentReference onlineRef = db.collection("online-users").document(userId);
         OnlineUser onlineUser = new OnlineUser(get_battleTag);

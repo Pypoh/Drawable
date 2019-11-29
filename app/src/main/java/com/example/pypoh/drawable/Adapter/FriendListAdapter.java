@@ -1,6 +1,7 @@
 package com.example.pypoh.drawable.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.example.pypoh.drawable.R;
@@ -45,7 +48,17 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
 
     @Override
     public void onBindViewHolder(@NonNull friendViewHolder holder, int position) {
-        FriendModel current = friend.get(position);
+        final FriendModel current = friend.get(position);
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                current.getBattletag();
+                Intent toMatching = new Intent(context, MatchingActivity.class);
+                toMatching.putExtra("BATTLE_TAG_KEY", current.getBattletag());
+                context.startActivity(toMatching);
+                Toast.makeText(context, current.getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
         holder.tv_friends_name.setText(current.getName());
         holder.tv_friends_rank.setText(String.valueOf(current.getLevel()));
         if (current.isOnline()) {
@@ -65,6 +78,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
         private TextView tv_friends_name, tv_friends_rank;
         private CircleImageView civ_friends_pict;
         private View online_indicator;
+        private CardView cardView;
 
         public friendViewHolder(@NonNull View itemView, FriendListAdapter adapter) {
             super(itemView);
@@ -72,6 +86,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
             tv_friends_rank = itemView.findViewById(R.id.tv_rank_profile);
             online_indicator = itemView.findViewById(R.id.online_indicator);
             civ_friends_pict = itemView.findViewById(R.id.iv_profile_pict);
+            cardView = itemView.findViewById(R.id.cv_friend);
         }
     }
 
