@@ -19,6 +19,10 @@ public class UserModel {
         this.level = level;
     }
 
+    public UserModel(String battleTag) {
+        this.battleTag = battleTag;
+    }
+
     public UserModel() {
 
     }

@@ -6,16 +6,32 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.pypoh.drawable.MainFragment.BattleFragment;
+import com.example.pypoh.drawable.Model.UserModel;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
     // Fragments
     private BattleFragment battleFragment = new BattleFragment();
+
+    // Firebase Utils
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private FirebaseFirestore db;
+    private String userId;
 
     // Utils
     boolean doubleBackToExitPressedOnce = false;
@@ -53,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        mUser = mAuth.getCurrentUser();
+
         bottomMenu = navView.getMenu();
 
         setFragment(battleFragment);
@@ -80,5 +100,66 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
 
         // TODO: On Back Pressed When Last Fragment
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        setOfflineUser();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setOnlineUser();
+    }
+
+    private void setOnlineUser() {
+        userId = mAuth.getCurrentUser().getUid();
+        Log.d("userIdDebug", userId + " ");
+
+        DocumentReference userBattleTag = db.collection("users").document(userId);
+        userBattleTag.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot != null) {
+                        UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                        DocumentReference userRef = db.collection("online-users").document(userId);
+                        if (userModel != null) {
+                            userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d("setOnlineSuccess", "User online!");
+                                    }
+                                }
+                            });
+                        } else {
+                            Log.d("setOnlineError", "Failed to find user");
+                        }
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed get user data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void setOfflineUser() {
+        String userId = mAuth.getCurrentUser().getUid();
+        DocumentReference onlineUserRef = db.collection("online-users").document(userId);
+        onlineUserRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d("setOfflineUser", "User Offline!");
+                }
+            }
+        });
+
     }
 }

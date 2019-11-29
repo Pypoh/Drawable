@@ -26,6 +26,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
@@ -206,6 +207,7 @@ public class RegisterFragment extends Fragment {
 
     private void insertUserData(String battleTag, String email) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         DocumentReference userRef = db.collection("users").document(userId);
 
         UserModel userModel = new UserModel(userId, battleTag, email, 0);

@@ -1,6 +1,9 @@
 package com.example.pypoh.drawable.MainFragment;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -13,6 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pypoh.drawable.Adapter.ModeAdapter;
 import com.example.pypoh.drawable.Model.ModeModel;
@@ -33,6 +40,9 @@ public class BattleFragment extends Fragment {
     // Circle Indicator Utils
     PagerSnapHelper pagerSnapHelper;
     CircleIndicator2 indicator;
+
+    // Dialog Utils
+    Dialog opponentDialog;
 
     public BattleFragment() {
         // Required empty public constructor
@@ -72,11 +82,38 @@ public class BattleFragment extends Fragment {
         // Setup RecyclerView
         recyclerViewMode.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         modeAdapter = new ModeAdapter(getContext(), modeData);
+        modeAdapter.setOnItemClickListener(new ModeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ModeModel modeModel) {
+                showOpponentDialog();
+            }
+        });
         recyclerViewMode.setAdapter(modeAdapter);
 
         pagerSnapHelper.attachToRecyclerView(recyclerViewMode);
         indicator.attachToRecyclerView(recyclerViewMode, pagerSnapHelper);
 
 
+
+    }
+
+    private void showOpponentDialog() {
+        opponentDialog = new Dialog(getContext());
+        opponentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        opponentDialog.setContentView(R.layout.dialog_opponent);
+        opponentDialog.setCancelable(true);
+
+        Button buttonRandomOpponent = opponentDialog.findViewById(R.id.button_battle_random);
+        buttonRandomOpponent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Under Development", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        opponentDialog.show();
+        Window window = opponentDialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        opponentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 }

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/dialog_background"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
+    android:layout_marginLeft="32dp"
+    android:layout_marginRight="32dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Opponent"
+        android:textSize="24sp"
+        android:textColor="@color/semi_black"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_battle_opponent"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/image_random_opponent"
+                android:layout_width="300dp"
+                android:layout_height="96dp"
+                android:src="@drawable/random"
+                android:scaleType="centerCrop"
+                app:riv_corner_radius_top_left="16dp"
+                app:riv_corner_radius_top_right="16dp"/>
+
+            <LinearLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_dialog_opponent"
+                android:layout_below="@id/image_random_opponent"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Random Opponent"
+                    android:textColor="@color/semi_black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="24dp"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button_battle_random"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Battle"
+                android:textAllCaps="false"
+                android:background="@drawable/button_half_rounded_solid_primary"
+                android:layout_alignRight="@id/image_random_opponent"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="24dp"/>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- friend card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_battle_friend"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        android:layout_marginTop="16dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/image_random_friend"
+                android:layout_width="300dp"
+                android:layout_height="96dp"
+                android:src="@drawable/friend"
+                android:scaleType="centerCrop"
+                app:riv_corner_radius_top_left="16dp"
+                app:riv_corner_radius_top_right="16dp"/>
+
+            <LinearLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_dialog_opponent"
+                android:layout_below="@id/image_random_friend"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Battle with Friend"
+                    android:textColor="@color/semi_black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="24dp"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button_battle_friend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Invite"
+                android:textAllCaps="false"
+                android:background="@drawable/button_half_rounded_solid_primary"
+                android:layout_alignRight="@id/image_random_friend"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="24dp"/>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
