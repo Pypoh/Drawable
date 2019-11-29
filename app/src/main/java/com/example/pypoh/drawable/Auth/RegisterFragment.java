@@ -9,6 +9,8 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +28,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
@@ -69,10 +70,21 @@ public class RegisterFragment extends Fragment {
                 signUp(editEmail.getText().toString(), editPassword.getText().toString());
             }
         });
-
-
         textDummyHintName = view.findViewById(R.id.text_dummy_hint_name);
         editBattletag = view.findViewById(R.id.edit_battletag);
+        InputFilter filter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                for (int i = start; i < end; i++) {
+                    if (!Character.isLetterOrDigit(source.charAt(i))) { // Accept only letter & digits ; otherwise just return
+                        Toast.makeText(getContext(),"Invalid Input",Toast.LENGTH_SHORT).show();
+                        return "";
+                    }
+                }
+                return null;
+            }
+        };
+        editBattletag.setFilters(new InputFilter[]{filter});
         editBattletag.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -119,6 +131,7 @@ public class RegisterFragment extends Fragment {
 
         textDummyHintPassword = view.findViewById(R.id.text_dummy_hint_password);
         editPassword = view.findViewById(R.id.edit_password);
+
         editPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -178,6 +191,7 @@ public class RegisterFragment extends Fragment {
             editEmail.requestFocus();
             return;
         }
+
         if(TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "Please Enter Your Password...", Toast.LENGTH_SHORT).show();
             editPassword.requestFocus();
@@ -199,6 +213,7 @@ public class RegisterFragment extends Fragment {
                             insertUserData(editBattletag.getText().toString(), editEmail.getText().toString());
                         } else {
                             signUpBtn.setEnabled(true);
+                            task.getException();
                             Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -209,8 +224,10 @@ public class RegisterFragment extends Fragment {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DocumentReference userRef = db.collection("users").document(userId);
+        String numBattleTag = userId.substring(0 , 4);
+        String name = battleTag;
 
-        UserModel userModel = new UserModel(userId, battleTag, email, 0);
+        UserModel userModel = new UserModel(battleTag+"#"+numBattleTag, name, 0, 0, 0, 0, false);
 
         userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -223,6 +240,7 @@ public class RegisterFragment extends Fragment {
             }
         });
     }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

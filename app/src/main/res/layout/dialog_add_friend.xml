@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add Friend"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingTop="24dp"
+                android:textColor="@color/semi_black"
+                tools:ignore="MissingConstraints"
+                android:layout_marginLeft="8dp"/>
+            <ImageView
+                android:id="@+id/iv_close"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_close_black_24dp"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:ignore="MissingConstraints"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/et_battle_tag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="battletag#000"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                tools:ignore="MissingConstraints" />
+            <ImageView
+                android:id="@+id/bt_checker"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_check_circle_black_24dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="26dp"
+                android:layout_alignParentRight="true"
+                tools:ignore="MissingConstraints"
+                android:visibility="invisible"/>
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_add_friend"
+            android:layout_width="156dp"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:text="Add"
+            android:textAllCaps="false"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/dialog_background"/>
+    </LinearLayout>
+
+</LinearLayout>

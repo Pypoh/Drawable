@@ -1,8 +1,6 @@
 package com.example.pypoh.drawable.Auth;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,9 +20,13 @@ import android.widget.Toast;
 import com.example.pypoh.drawable.MainActivity;
 import com.example.pypoh.drawable.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginFragment extends Fragment {
 
@@ -32,7 +34,7 @@ public class LoginFragment extends Fragment {
     EditText editPassword;
     TextView textDummyHintEmail;
     EditText editEmail;
-
+    private FirebaseFirestore db;
     private Button loginBtn;
 
     // Firebase
@@ -48,7 +50,7 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-
+        db = FirebaseFirestore.getInstance();
         loginBtn = view.findViewById(R.id.button_login);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,12 +111,12 @@ public class LoginFragment extends Fragment {
     }
 
     private void loginUserEmailPass(String email, String password) {
-        if(TextUtils.isEmpty(email)){
-            Toast.makeText(getActivity(),"Please Enter Your Email", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(getActivity(), "Please Enter Your Email", Toast.LENGTH_SHORT).show();
             editEmail.requestFocus();
             return;
         }
-        if (TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(getActivity(), "Please Enter Your Password", Toast.LENGTH_SHORT).show();
             editPassword.requestFocus();
             return;
@@ -123,6 +125,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+//                    getData();
                     toMain();
                 } else {
                     Toast.makeText(getContext(), "Fail", Toast.LENGTH_SHORT).show();
@@ -135,6 +138,7 @@ public class LoginFragment extends Fragment {
 
     private void toMain() {
         Intent toMain = new Intent(getContext(), MainActivity.class);
+        toMain.putExtra("userId",mAuth.getCurrentUser().getUid());
         startActivity(toMain);
         getActivity().finish();
     }
@@ -146,4 +150,28 @@ public class LoginFragment extends Fragment {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
     }
+
+    /*private void getData() {
+        final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        db.collection("users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String get_battleTag = documentSnapshot.getString("battleTag");
+                setOnline(userId, get_battleTag);
+            }
+        });
+
+    }
+    private void setOnline(String userId, String get_battleTag) {
+        DocumentReference onlineRef = db.collection("online-users").document(userId);
+        OnlineUser onlineUser = new OnlineUser(get_battleTag);
+        onlineRef.set(onlineUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(getContext(), "Anda berhasil online", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }*/
+
+
 }

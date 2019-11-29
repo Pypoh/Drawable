@@ -2,7 +2,7 @@ package com.example.pypoh.drawable.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class UserModel {
+public class FriendModel {
 
     @SerializedName("battleTag")
     private String battleTag;
@@ -19,42 +19,6 @@ public class UserModel {
     @SerializedName("online")
     private boolean online;
 
-    public UserModel(String battleTag, String name, int level, int matches, int win, int loss, boolean online) {
-        this.battleTag = battleTag;
-        this.name = name;
-        this.level = level;
-        this.matches = matches;
-        this.win = win;
-        this.loss = loss;
-        this.online = online;
-    }
-    public UserModel() {
-
-    }
-
-    public String getBattleTag() {
-        return battleTag;
-    }
-
-    public void setBattleTag(String battleTag) {
-        this.battleTag = battleTag;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
 
     public int getMatches() {
         return matches;
@@ -78,6 +42,43 @@ public class UserModel {
 
     public void setLoss(int loss) {
         this.loss = loss;
+    }
+
+    public FriendModel(String battletag, String name, int level, int matches, int win, int loss, boolean online) {
+        this.battleTag = battletag;
+        this.name = name;
+        this.level = level;
+        this.matches = matches;
+        this.win = win;
+        this.loss = loss;
+        this.online = online;
+    }
+    public FriendModel() {
+
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public String getBattletag() {
+        return battleTag;
+    }
+
+    public void setBattletag(String battletag) {
+        this.battleTag = battletag;
     }
 
     public boolean isOnline() {

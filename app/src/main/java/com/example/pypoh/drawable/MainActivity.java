@@ -12,8 +12,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.pypoh.drawable.MainFragment.BattleFragment;
+import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,16 +24,20 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     // Fragments
     private BattleFragment battleFragment = new BattleFragment();
+    private FriendFragment friendFragment = new FriendFragment();
 
     // Firebase Utils
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private FirebaseFirestore db;
     private String userId;
+    public static ArrayList<FriendModel> friend;
 
     // Utils
     boolean doubleBackToExitPressedOnce = false;
@@ -48,10 +54,10 @@ public class MainActivity extends AppCompatActivity {
                     setFragment(battleFragment);
 //                    changeIconStateBar(R.id.navigation_adventure, R.drawable.navbar_lesson_on);
                     return true;
-//                case R.id.navigation_friend:
-//                    setFragment(playFragment);
-////                    changeIconStateBar(R.id.navigation_pronounciation, R.drawable.navbar_play_on);
-//                    return true;
+                case R.id.navigation_friend:
+                    setFragment(friendFragment);
+//                    changeIconStateBar(R.id.navigation_pronounciation, R.drawable.navbar_play_on);
+                    return true;
 //                case R.id.navigation_profile:
 //                    setFragment(battleFragment);
 ////                    changeIconStateBar(R.id.navigation_multiplayer, R.drawable.navbar_battle_on);
@@ -162,4 +168,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    /*private void setOnline(String userId, String get_battleTag) {
+        DocumentReference onlineRef = db.collection("online-users").document(userId);
+        OnlineUser onlineUser = new OnlineUser(get_battleTag);
+        onlineRef.set(onlineUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+            }
+        });
+    }*/
 }
