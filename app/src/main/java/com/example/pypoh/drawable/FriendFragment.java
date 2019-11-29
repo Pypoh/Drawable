@@ -32,8 +32,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -43,9 +47,6 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.example.pypoh.drawable.MainActivity.friend;
-
-
 public class FriendFragment extends Fragment {
 
     private Dialog customDialog;
@@ -54,25 +55,19 @@ public class FriendFragment extends Fragment {
     private ImageView iv_close, iv_add_friend;
 
     public TextView tv_nama, tv_rank;
-    public CircleImageView profil_pict;
     public Boolean online_indicator;
 
-    private final int PICK_IMAGE_REQUEST = 1;
     private FirebaseAuth auth;
-    private String urlfotouser;
     private StorageReference imageStorage;
     private FirebaseFirestore db;
-    private CircleImageView civ_profile;
-    private Task<QuerySnapshot> getdata;
-    private String save_id, save_battleTag, save_nama;
-    private int save_level;
-    private boolean save_online = false;
     private ImageView bt_checker;
     private RecyclerView recyclerView;
     public static FriendListAdapter mAdapter;
     private FriendModel friendModel;
     private UserModel userModel;
     private String friendUid;
+
+    private List<FriendModel> friendsData = new ArrayList<>();
 
     public FriendFragment() {
         // Required empty public constructor
@@ -90,14 +85,38 @@ public class FriendFragment extends Fragment {
 
         imageStorage = FirebaseStorage.getInstance().getReference();
         initViews(view);
-
         recyclerView = view.findViewById(R.id.recycler_friend);
-        mAdapter = new FriendListAdapter(getContext(), friend);
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    private void getData() {
+        String uid = auth.getCurrentUser().getUid();
+        CollectionReference friendRef = db.collection("users").document(uid).collection("friend");
+        friendRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    System.err.println("Listen failed: " + e);
+                    return;
+                }
+
+                if (queryDocumentSnapshots != null) {
+                    // Disini tambah data
+                    friendsData.clear();
+                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                        FriendModel friendModel = documentSnapshot.toObject(FriendModel.class);
+                        friendsData.add(friendModel);
+                    }
+                    mAdapter.notifyDataSetChanged();
+//                    System.out.println("Current data: " + queryDocumentSnapshots.getData());
+                } else {
+                    System.out.print("Current data: null");
+                }
+            }
+        });
     }
 
     private void initViews(View view) {
@@ -110,7 +129,7 @@ public class FriendFragment extends Fragment {
         customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         customDialog.setContentView(R.layout.dialog_add_friend);
         Window window = customDialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         customDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         customDialog.setCancelable(false);
 
@@ -124,7 +143,7 @@ public class FriendFragment extends Fragment {
                 customDialog.dismiss();
                 et_battleTag.setText("");
                 bt_checker.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(),"Berhasil menambahkan teman", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Berhasil menambahkan teman", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -147,16 +166,6 @@ public class FriendFragment extends Fragment {
 
             }
         });
-        /*et_battleTag.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(et_battleTag.is) {
-
-                }
-                return false;
-            }
-        });
-*/
         iv_close = customDialog.findViewById(R.id.iv_close);
         iv_close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +186,8 @@ public class FriendFragment extends Fragment {
                 customDialog.show();
             }
         });
+
+
     }
 
     private void searchBattleTag(String battleTag) {
@@ -206,6 +217,10 @@ public class FriendFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         getMyData();
+        getData();
+        mAdapter = new FriendListAdapter(getContext(), friendsData);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     private void getMyData() {

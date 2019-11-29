@@ -22,15 +22,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.friendViewHolder> {
+
     private Context context;
-    private ArrayList<FriendModel> friend;
+    private List<FriendModel> friend;
 
-
-    public FriendListAdapter(Context context, ArrayList<FriendModel> friend) {
+    public FriendListAdapter(Context context, List<FriendModel> friend) {
         this.context = context;
         this.friend = friend;
     }
@@ -38,7 +39,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
     @NonNull
     @Override
     public friendViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_friend, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend, parent, false);
         return new friendViewHolder(view, this);
     }
 
@@ -46,14 +47,18 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
     public void onBindViewHolder(@NonNull friendViewHolder holder, int position) {
         FriendModel current = friend.get(position);
         holder.tv_friends_name.setText(current.getName());
-        holder.tv_friends_rank.setText(current.getLevel());
-        holder.online_indicator.setVisibility(View.VISIBLE);
-        holder.online_indicator.setBackgroundColor(R.drawable.online_indicator);
+        holder.tv_friends_rank.setText(String.valueOf(current.getLevel()));
+        if (current.isOnline()) {
+            holder.online_indicator.setVisibility(View.VISIBLE);
+        } else {
+            holder.online_indicator.setVisibility(View.INVISIBLE);
+        }
+        //        holder.online_indicator.setBackgroundColor(R.drawable.online_indicator);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return friend.size();
     }
 
     public class friendViewHolder extends RecyclerView.ViewHolder {

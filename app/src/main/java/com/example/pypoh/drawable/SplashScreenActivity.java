@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.pypoh.drawable.Auth.AuthActivity;
+import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,6 +18,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -25,6 +30,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     private FirebaseUser mUser;
     private FirebaseFirestore db;
     private String userId;
+    private List<String> allFriend = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,16 +43,16 @@ public class SplashScreenActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     Thread.sleep(2000);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (mAuth.getCurrentUser() != null){
+                if (mAuth.getCurrentUser() != null) {
                     mUser = mAuth.getCurrentUser();
                     intent = new Intent(getApplicationContext(), MainActivity.class);
                     setOnlineUser();
-                }else {
+                } else {
                     intent = new Intent(getApplicationContext(), AuthActivity.class);
                 }
                 startActivity(intent);
@@ -73,6 +79,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+                                        tellOthersThatImFuckingOnline();
                                         Log.d("setOnlineSuccess", "User online!");
                                     }
                                 }
@@ -86,6 +93,25 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void tellOthersThatImFuckingOnline() {
+        String uid = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                for (DocumentSnapshot doc : task.getResult()) {
+                    String friendId = doc.getId();
+                    allFriend.add(friendId);
+                }
+            }
+        });
+
+        // get data from users
+        for (String id : allFriend) {
+            Log.d("userOnlineDebugs", id + " : " + uid);
+            db.collection("users").document(id).collection("friend").document(uid).update("online", true);
+        }
     }
 
 

@@ -23,8 +23,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Utils
     boolean doubleBackToExitPressedOnce = false;
+
+    private List<String> allFriend = new ArrayList<>();
+
 
     private Menu bottomMenu;
 
@@ -113,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         setOfflineUser();
+        tellOthersThatImFuckingOffline();
     }
 
     @Override
@@ -120,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         setOnlineUser();
+        tellOthersThatImFuckingOnline();
     }
 
     private void setOnlineUser() {
@@ -169,6 +176,45 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void tellOthersThatImFuckingOnline() {
+        String uid = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                for (DocumentSnapshot doc : task.getResult()) {
+                    String friendId = doc.getId();
+                    Log.d("userOnlineDebugLagi", friendId);
+                    allFriend.add(friendId);
+                }
+            }
+        });
+
+        // get data from users
+        for (String id : allFriend) {
+            Log.d("userOnlineDebugs", id + " : " + uid);
+            db.collection("users").document(id).collection("friend").document(uid).update("online", true);
+        }
+    }
+
+    private void tellOthersThatImFuckingOffline() {
+        String uid = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                for (DocumentSnapshot doc : task.getResult()) {
+                    String friendId = doc.getId();
+                    Log.d("userOnlineDebugLagi", friendId);
+                    allFriend.add(friendId);
+                }
+            }
+        });
+
+        // get data from users
+        for (String id : allFriend) {
+            Log.d("userOnlineDebugs", id + " : " + uid);
+            db.collection("users").document(id).collection("friend").document(uid).update("online", false);
+        }
+    }
     /*private void setOnline(String userId, String get_battleTag) {
         DocumentReference onlineRef = db.collection("online-users").document(userId);
         OnlineUser onlineUser = new OnlineUser(get_battleTag);
