@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
         setFragment(battleFragment);
 
         checkNotification();
-
     }
 
 //    private void changeIconStateBar(int pathItem, int pathIcon) {
@@ -136,20 +135,28 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         tellOthersThatImFuckingOffline();
+        setOfflineUser();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        setOfflineUser();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        setOnlineUser();
+        tellOthersThatImFuckingOnline();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         setOnlineUser();
         tellOthersThatImFuckingOnline();
+
     }
 
     private void setOnlineUser() {
@@ -279,9 +286,6 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(false)
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .addAction(R.drawable.ic_check_black_24dp, "Accept", resultPendingIntent);
-
-
-
         mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

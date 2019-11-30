@@ -95,6 +95,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tellOthersThatImFuckingOnline();
+    }
+
     private void tellOthersThatImFuckingOnline() {
         String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

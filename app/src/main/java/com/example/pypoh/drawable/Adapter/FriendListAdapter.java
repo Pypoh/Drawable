@@ -1,10 +1,12 @@
 package com.example.pypoh.drawable.Adapter;
 
+import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pypoh.drawable.FriendFragment;
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.UserModel;
@@ -33,6 +36,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
 
     private Context context;
     private List<FriendModel> friend;
+    private OnItemClickListener onItemClickListener;
 
     public FriendListAdapter(Context context, List<FriendModel> friend) {
         this.context = context;
@@ -49,24 +53,27 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
     @Override
     public void onBindViewHolder(@NonNull friendViewHolder holder, int position) {
         final FriendModel current = friend.get(position);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                current.getBattletag();
-                Intent toMatching = new Intent(context, MatchingActivity.class);
-                toMatching.putExtra("BATTLE_TAG_KEY", current.getBattletag());
-                context.startActivity(toMatching);
-                Toast.makeText(context, current.getName(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        holder.bind(current,onItemClickListener);
         holder.tv_friends_name.setText(current.getName());
         holder.tv_friends_rank.setText(String.valueOf(current.getLevel()));
         if (current.isOnline()) {
             holder.online_indicator.setVisibility(View.VISIBLE);
+
         } else {
             holder.online_indicator.setVisibility(View.INVISIBLE);
         }
         //        holder.online_indicator.setBackgroundColor(R.drawable.online_indicator);
+    }
+    public interface OnItemClickListener {
+        void onItemClick(FriendModel friendModel);
+    }
+
+    public OnItemClickListener getOnItemClickListener() {
+        return onItemClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -87,6 +94,14 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
             online_indicator = itemView.findViewById(R.id.online_indicator);
             civ_friends_pict = itemView.findViewById(R.id.iv_profile_pict);
             cardView = itemView.findViewById(R.id.cv_friend);
+        }
+        public void bind(final FriendModel friendModel, final OnItemClickListener listener) {
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(friendModel);
+                }
+            });
         }
     }
 

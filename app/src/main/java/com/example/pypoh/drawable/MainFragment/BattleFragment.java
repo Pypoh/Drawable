@@ -2,6 +2,7 @@ package com.example.pypoh.drawable.MainFragment;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.pypoh.drawable.Adapter.FriendListAdapter;
 import com.example.pypoh.drawable.Adapter.ModeAdapter;
+import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.ModeModel;
 import com.example.pypoh.drawable.R;
@@ -63,6 +65,10 @@ public class BattleFragment extends Fragment {
     // Adapter
 
     public BattleFragment() {
+        // Required empty public constructor
+    }
+
+    public BattleFragment(FriendModel friendModel) {
         // Required empty public constructor
     }
 
@@ -154,6 +160,14 @@ public class BattleFragment extends Fragment {
         RecyclerView recyclerViewFriends = friendListDialog.findViewById(R.id.recycler_battle_friend);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(getContext()));
         FriendListAdapter friendListAdapter = new FriendListAdapter(getContext(), friendsData);
+        friendListAdapter.setOnItemClickListener(new FriendListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(FriendModel friendModel) {
+                Intent toMatching = new Intent(getContext(), MatchingActivity.class);
+                    toMatching.putExtra("BATTLE_TAG_KEY", friendModel.getBattletag());
+                    getActivity().startActivity(toMatching);
+            }
+        });
         getData(friendListAdapter);
         recyclerViewFriends.setAdapter(friendListAdapter);
         friendListDialog.show();
