@@ -40,7 +40,11 @@ public class MatchingActivity extends AppCompatActivity {
     private int status;
     FirebaseAuth mAuth;
     FirebaseFirestore db;
-    List<NotifModel> listNotification = new ArrayList<>();
+//    List<NotifModel> listNotification = new ArrayList<>();
+
+    QuestionModel questionModel = new QuestionModel();
+
+    ArrayList<String> questionFiltered = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,62 +64,8 @@ public class MatchingActivity extends AppCompatActivity {
     }
 
     private void checkStatus(int status) {
-        switch (status) {
-            case 0:
-                setFragment(matchingFragment, status);
-                break;
-            case 1:
-                setFragment(matchingFragment, status);
-                // ubah data di firestore
-                updateNotificationData();
-
-        }
+        setFragment(matchingFragment, status);
     }
-
-    private void updateNotificationData() {
-        final String uid = mAuth.getCurrentUser().getUid();
-        db.collection("users").document(uid).collection("notification").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (queryDocumentSnapshots != null) {
-                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        NotifModel notifModel1 = doc.toObject(NotifModel.class);
-                        if (notifModel1 != null) {
-                            if (notifModel1.getStatus() == 2) {
-                                // Intent ke aktipiiti sebelah;
-                                setFragment(acceptMatchingFragment, 0);
-                            } else if (notifModel1.getStatus() == 1) {
-                                // nanti send notif juga
-                                // intent ke main
-                            }
-                        }
-                    }
-
-                }
-            }
-        });
-        db.collection("users").document(uid).collection("notification").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot doc : task.getResult()) {
-                        listNotification.add(doc.toObject(NotifModel.class));
-                    }
-                    try {
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                db.collection("users").document(uid).collection("notification").document(listNotification.get(0).getBattleTag()).update("status", 2);
-                            }
-                        }, 2000);
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-        });
-    }
-
 
     public String getOpponentBattleTag() {
         return opponentBattleTag;
@@ -142,4 +92,42 @@ public class MatchingActivity extends AppCompatActivity {
 //        ft.addToBackStack(null);
         ft.commit();
     }
+
+//    private void divideQuestion(final String roomId) {
+//        String uId = mAuth.getCurrentUser().getUid();
+//        db.collection("question").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+//                    if (task.isSuccessful()) {
+//                        ArrayList<String> a = new ArrayList<>();
+//                        questionModel = documentSnapshot.toObject(QuestionModel.class);
+//                        if (questionModel != null) {
+//                            a.addAll(questionModel.getQuestionList());
+//                        }
+//                        Collections.shuffle(a);
+//                        questionModel.setQuestionList(a);
+//                    }
+//                }
+//                questionFiltered.clear();
+//                for (int i = 0; i < 18; i++) {
+//                    // disini dia ga dapet question modelnya
+//                    questionFiltered.add(questionModel.getQuestionList().get(i));
+//                }
+//                db.collection("room").document(roomId).update("availableQuestion", questionFiltered).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            Log.d("question", questionModel.getQuestionList().get(0));
+//                        }
+//                    }
+//                });
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(MatchingActivity.this, "Tidak ada data", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 }

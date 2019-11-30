@@ -116,6 +116,9 @@ public class MainActivity extends AppCompatActivity {
         setFragment(battleFragment);
 
         checkNotification();
+
+        setOnlineUser();
+        tellOthersThatImFuckingOnline();
     }
 
 //    private void changeIconStateBar(int pathItem, int pathIcon) {
@@ -157,15 +160,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        setOnlineUser();
-        tellOthersThatImFuckingOnline();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        if (mAuth != null && db != null) {
+            setOnlineUser();
+            tellOthersThatImFuckingOnline();
+        }
     }
 
     private void setOnlineUser() {
@@ -216,27 +219,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tellOthersThatImFuckingOnline() {
-        String uid = mAuth.getCurrentUser().getUid();
+        final String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                allFriend.clear();
                 for (DocumentSnapshot doc : task.getResult()) {
                     String friendId = doc.getId();
                     Log.d("userOnlineDebugLagi", friendId);
                     allFriend.add(friendId);
                 }
+                // get data from users
+                for (String id : allFriend) {
+                    Log.d("userOnlineDebugs", id + " : " + uid);
+                    db.collection("users").document(id).collection("friend").document(uid).update("online", true);
+                }
             }
         });
 
-        // get data from users
-        for (String id : allFriend) {
-            Log.d("userOnlineDebugs", id + " : " + uid);
-            db.collection("users").document(id).collection("friend").document(uid).update("online", true);
-        }
+
     }
 
     private void tellOthersThatImFuckingOffline() {
-        String uid = mAuth.getCurrentUser().getUid();
+        final String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -245,14 +250,15 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("userOnlineDebugLagi", friendId);
                     allFriend.add(friendId);
                 }
+                // get data from users
+                for (String id : allFriend) {
+                    Log.d("userOnlineDebugs", id + " : " + uid);
+                    db.collection("users").document(id).collection("friend").document(uid).update("online", false);
+                }
             }
         });
 
-        // get data from users
-        for (String id : allFriend) {
-            Log.d("userOnlineDebugs", id + " : " + uid);
-            db.collection("users").document(id).collection("friend").document(uid).update("online", false);
-        }
+
     }
 
     private void checkNotification() {
@@ -264,8 +270,10 @@ public class MainActivity extends AppCompatActivity {
                     for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
                         NotifModel notifModel = documentSnapshot.toObject(NotifModel.class);
                         if (notifModel != null) {
-                            // disini munculin notif
-                            pushNotification();
+                            if (notifModel.getStatus() == 0) {
+                                pushNotification();
+
+                            }
 
                         }
                         /*FriendModel friendModel = documentSnapshot.toObject(FriendModel.class);

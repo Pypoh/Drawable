@@ -54,27 +54,29 @@ public class SelectQuestionFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
+        recyclerViewOptions.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         if (bundle != null) {
             questionsData = bundle.getStringArrayList("QUESTIONS_KEY");
             playerCode = bundle.getInt("PLAYER_KEY");
-            for (int i = 0; i < 9; i++) {
-                assert questionsData != null;
-                playerOneQuestion.add(questionsData.get(i));
+            switch (playerCode) {
+                case 0:
+                    for (int i = 0; i < 9; i++) {
+                        assert questionsData != null;
+                        playerOneQuestion.add(questionsData.get(i));
+                    }
+                    optionsAdapter = new OptionsAdapter(getContext(), playerOneQuestion);
+                    break;
+                case 1:
+                    for (int i = 9; i < 18; i++) {
+                        playerTwoQuestion.add(questionsData.get(i));
+                    }
+                    optionsAdapter = new OptionsAdapter(getContext(), playerTwoQuestion);
+                    break;
             }
-            for (int i = 10; i < 18; i++) {
-                playerTwoQuestion.add(questionsData.get(i));
-            }
+
 
         }
-
-        recyclerViewOptions.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        if (playerCode == 0) {
-            optionsAdapter = new OptionsAdapter(getContext(), playerOneQuestion);
-        } else {
-            optionsAdapter = new OptionsAdapter(getContext(), playerTwoQuestion);
-        }
-
         recyclerViewOptions.setAdapter(optionsAdapter);
 
     }

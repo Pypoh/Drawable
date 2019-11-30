@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -239,6 +240,7 @@ public class FriendFragment extends Fragment {
 
     private void searchBattleTag(final String battleTag) {
         final String userId = auth.getCurrentUser().getUid();
+        final Handler handler;
         db.collection("users").whereEqualTo("battleTag", battleTag).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -250,8 +252,10 @@ public class FriendFragment extends Fragment {
 
                                 friendModel = doc.toObject(FriendModel.class);
                                 bt_checker.setVisibility(View.VISIBLE);
+                                btn_add.setEnabled(true);
                             } else {
                                 bt_checker.setVisibility(View.INVISIBLE);
+                                btn_add.setEnabled(false);
                                 Toast.makeText(getContext(), friend.getName() + " Telah berteman", Toast.LENGTH_SHORT).show();
 
                             }

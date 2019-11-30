@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,8 @@ public class MatchingFragment extends Fragment {
     ArrayList<String> questionFiltered = new ArrayList<>();
 
     int playerCode;
+
+    List<NotifModel> listNotification = new ArrayList<>();
 
 
     public MatchingFragment() {
@@ -93,6 +96,7 @@ public class MatchingFragment extends Fragment {
                     createRoom();
                     break;
                 case 1:
+                    updateNotificationData();
                     break;
             }
         }
@@ -122,7 +126,7 @@ public class MatchingFragment extends Fragment {
 
     private void sendNotificationToOpponent(final String friendUid) {
         String uid = mAuth.getCurrentUser().getUid();
-        final NotifModel notifModel = new NotifModel(uid, 0);
+        final NotifModel notifModel = new NotifModel(uid, 0, roomId);
         Log.d("friendUIDNotif", friendUid);
         db.collection("users").document(friendUid).collection("notification").document(uid).set(notifModel).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -144,7 +148,7 @@ public class MatchingFragment extends Fragment {
                             Bundle bundle = new Bundle();
                             bundle.putInt("PLAYER_KEY", playerCode);
                             bundle.putStringArrayList("QUESTIONS_KEY", questionFiltered);
-                            ((MatchingActivity) getActivity()).setFragmentWithBundle(((MatchingActivity) getActivity()).acceptMatchingFragment, bundle);
+                            ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
                         } else if (notifModel1.getStatus() == 1) {
                             // nanti send notif juga
                             db.collection("room").document(roomId).delete();
@@ -166,8 +170,97 @@ public class MatchingFragment extends Fragment {
 
     }
 
+    private void updateNotificationData() {
+        final String uid = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(uid).collection("notification").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (queryDocumentSnapshots != null) {
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        NotifModel notifModel1 = doc.toObject(NotifModel.class);
+                        if (notifModel1 != null) {
+                            if (notifModel1.getStatus() == 2) {
+                                // Intent ke aktipiiti sebelah;
+                                String roomId = notifModel1.getRoomId();
+                                setQuestionForInvitedPerson(roomId);
+                            } else if (notifModel1.getStatus() == 1) {
+                                // state gagal
+//                                ((MatchingActivity) getActivity()).setFragment(new AcceptMatchingFragment(), 0);
+                                // nanti send notif juga
+                                // intent ke main
+                            }
+                        }
+                    }
+
+                }
+            }
+        });
+        db.collection("users").document(uid).collection("notification").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot doc : task.getResult()) {
+                        listNotification.add(doc.toObject(NotifModel.class));
+                    }
+                    try {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                db.collection("users").document(uid).collection("notification").document(listNotification.get(0).getBattleTag()).update("status", 2);
+                            }
+                        }, 2000);
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+        });
+    }
+
+    private void setQuestionForInvitedPerson(final String roomId) {
+        db.collection("question").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                    if (task.isSuccessful()) {
+                        ArrayList<String> a = new ArrayList<>();
+                        questionModel = documentSnapshot.toObject(QuestionModel.class);
+                        if (questionModel != null) {
+                            a.addAll(questionModel.getQuestionList());
+                        }
+                        Collections.shuffle(a);
+                        questionModel.setQuestionList(a);
+                    }
+                }
+                questionFiltered.clear();
+                for (int i = 0; i < 18; i++) {
+                    // disini dia ga dapet question modelnya
+                    questionFiltered.add(questionModel.getQuestionList().get(i));
+                }
+                db.collection("room").document(roomId).update("availableQuestion", questionFiltered).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("question", questionModel.getQuestionList().get(0));
+                        }
+                    }
+                });
+                // Setup for intent
+                Bundle bundle = new Bundle();
+                bundle.putInt("PLAYER_KEY", playerCode);
+                bundle.putStringArrayList("QUESTIONS_KEY", questionFiltered);
+                bundle.putString("ROOM_KEY", roomId);
+                ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Tidak ada data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void divideQuestion(final String roomId) {
-        String uId = mAuth.getCurrentUser().getUid();
         db.collection("question").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
