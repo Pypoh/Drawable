@@ -51,7 +51,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 if (mAuth.getCurrentUser() != null) {
                     mUser = mAuth.getCurrentUser();
                     intent = new Intent(getApplicationContext(), MainActivity.class);
-                    setOnlineUser();
+//                    setOnlineUser();
                 } else {
                     intent = new Intent(getApplicationContext(), AuthActivity.class);
                 }
@@ -61,7 +61,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void setOnlineUser() {
+    /*private void setOnlineUser() {
         userId = mAuth.getCurrentUser().getUid();
         Log.d("userIdDebug", userId + " ");
 
@@ -79,7 +79,6 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        tellOthersThatImFuckingOnline();
                                         Log.d("setOnlineSuccess", "User online!");
                                     }
                                 }
@@ -93,31 +92,11 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }
             }
         });
-    }
+    }*/
 
     @Override
     protected void onResume() {
         super.onResume();
-        tellOthersThatImFuckingOnline();
-    }
-
-    private void tellOthersThatImFuckingOnline() {
-        String uid = mAuth.getCurrentUser().getUid();
-        db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                for (DocumentSnapshot doc : task.getResult()) {
-                    String friendId = doc.getId();
-                    allFriend.add(friendId);
-                }
-            }
-        });
-
-        // get data from users
-        for (String id : allFriend) {
-            Log.d("userOnlineDebugs", id + " : " + uid);
-            db.collection("users").document(id).collection("friend").document(uid).update("online", true);
-        }
     }
 
 

@@ -51,7 +51,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendFragment extends Fragment {
 
-    private Dialog customDialog;
     private Button btn_add;
     private EditText et_battleTag;
     private ImageView iv_close, iv_add_friend;
@@ -120,12 +119,11 @@ public class FriendFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        initCustomDialog();
         initViewComponents(view);
     }
 
     private void initCustomDialog() {
-        customDialog = new Dialog(getContext());
+        final Dialog customDialog = new Dialog(getContext());
         customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         customDialog.setContentView(R.layout.dialog_add_friend);
         Window window = customDialog.getWindow();
@@ -175,6 +173,7 @@ public class FriendFragment extends Fragment {
                 customDialog.dismiss();
             }
         });
+        customDialog.show();
 
     }
 
@@ -183,14 +182,14 @@ public class FriendFragment extends Fragment {
         iv_add_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                customDialog.show();
+                initCustomDialog();
             }
         });
 
     }
 
     private void initProfileDialog(final FriendModel friendModel) {
-        customDialog = new Dialog(getContext());
+        final Dialog customDialog = new Dialog(getContext());
         customDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         customDialog.setContentView(R.layout.dialog_view_profile);
         Window window = customDialog.getWindow();
@@ -235,6 +234,7 @@ public class FriendFragment extends Fragment {
 
             }
         });
+        customDialog.show();
     }
 
     private void searchBattleTag(final String battleTag) {
@@ -289,7 +289,6 @@ public class FriendFragment extends Fragment {
             @Override
             public void onItemClick(FriendModel friendModel) {
                 initProfileDialog(friendModel);
-                customDialog.show();
             }
         });
         recyclerView.setAdapter(mAdapter);

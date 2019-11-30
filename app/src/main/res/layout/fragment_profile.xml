@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ProfileFragment">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingRight="32dp"
+        android:paddingLeft="32dp"
+        android:paddingTop="32dp"
+        >
+
+        <TextView
+            android:id="@+id/textProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textSize="30sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_below="@id/textProfile"
+            android:id="@+id/user_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/user_progress_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0">
+
+                <TextView
+                    android:id="@+id/text_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text=""
+                    android:textColor="@color/text_auth"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"/>
+
+                <TextView
+                    android:id="@+id/text_user_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text=""
+                    android:textColor="@color/text_auth"
+                    android:textSize="15sp"
+                    android:textStyle="normal"
+                    app:layout_constraintLeft_toRightOf="@id/user_progress_icon"
+                    app:layout_constraintTop_toBottomOf="@id/text_user_name" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_progress_icon"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/men" />
+
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_marginTop="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/user_progress_icon"
+                app:layout_constraintLeft_toLeftOf="parent"
+                >
+                <TextView
+                    android:id="@+id/textID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID :"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_auth"
+                    android:textSize="12sp"
+                    />
+                <TextView
+                    android:id="@+id/battletag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textStyle="bold"
+                    android:layout_marginLeft="3dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_auth"
+                    android:layout_toRightOf="@id/textID"
+                    />
+            </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/garis1"
+            android:layout_below="@id/user_header"
+            android:background="@color/semi_black"
+            android:layout_marginBottom="16dp"/>
+        <RelativeLayout
+            android:id="@+id/totMWL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/garis1"
+            android:paddingBottom="20dp"
+            >
+            <TextView
+                android:id="@+id/textStatistik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Statistik"
+                android:textColor="@color/text_auth"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                >
+            </TextView>
+            <LinearLayout
+                android:id="@+id/layoutMatches"
+                android:layout_below="@+id/textStatistik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="30dp"
+                >
+                <TextView
+                    android:id="@+id/totMatches"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textStatistik"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="center"
+                    android:text=""
+                    android:textColor="@color/text_auth"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                     />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:id="@+id/textMatches"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Matches"
+                    android:textColor="@color/text_auth"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutWin"
+                android:layout_toRightOf="@id/layoutMatches"
+                android:layout_below="@+id/textStatistik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="45dp"
+                >
+                <TextView
+                    android:id="@+id/totWin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textStatistik"
+                    android:layout_marginTop="10dp"
+                    android:text=""
+                    android:layout_gravity="center"
+                    android:textColor="@color/text_auth"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    />
+
+                <TextView
+                    android:id="@+id/textWin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Win"
+                    android:textColor="@color/text_auth"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutLoss"
+                android:layout_toRightOf="@id/layoutWin"
+                android:layout_below="@+id/textStatistik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="45dp"
+                >
+                <TextView
+                    android:id="@+id/totLos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textStatistik"
+                    android:layout_marginTop="10dp"
+                    android:text=""
+                    android:layout_gravity="center"
+                    android:textColor="@color/text_auth"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    />
+
+                <TextView
+                    android:layout_gravity="center"
+                    android:id="@+id/textLoss"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Loss"
+                    android:textColor="@color/text_auth"
+                    />
+            </LinearLayout>
+        </RelativeLayout>
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/garis2"
+            android:layout_below="@id/totMWL"
+            android:background="@color/semi_black"
+            android:layout_marginBottom="16dp"/>
+        <LinearLayout
+            android:layout_below="@id/garis2"
+            android:id="@+id/settingHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="vertical"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                >
+
+                <ImageView
+                    android:id="@+id/iconSetting"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ic_settings_black_24dp"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Setting"
+                    android:layout_toRightOf="@id/iconSetting"
+                    android:layout_centerInParent="true"
+                    android:layout_marginLeft="17dp"
+                    android:textColor="@color/text_auth"
+                    android:textStyle="bold"
+                    />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iconHelp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ic_help_black_24dp"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Help"
+                    android:layout_toRightOf="@id/iconHelp"
+                    android:layout_centerInParent="true"
+                    android:layout_marginLeft="17dp"
+                    android:textColor="@color/text_auth"
+                    android:textStyle="bold"
+                    />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/button_logout"
+                android:layout_width="250dp"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/rounded_button_solid_primary"
+                android:text="Logout"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+</ScrollView>

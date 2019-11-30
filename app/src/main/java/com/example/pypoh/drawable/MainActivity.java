@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     // Fragments
     private BattleFragment battleFragment = new BattleFragment();
     private FriendFragment friendFragment = new FriendFragment();
+    private ProfileFragment profileFragment = new ProfileFragment();
 
     // Firebase Utils
     private FirebaseAuth mAuth;
@@ -59,6 +60,16 @@ public class MainActivity extends AppCompatActivity {
     private NotificationCompat.Builder mBuilder;
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
     private NotificationManager mNotificationManager;
+
+    private UserModel userModel;
+
+    public UserModel getUserModel() {
+        return userModel;
+    }
+
+    public void setUserModel(UserModel userModel) {
+        this.userModel = userModel;
+    }
 
     private List<String> allFriend = new ArrayList<>();
 
@@ -79,10 +90,10 @@ public class MainActivity extends AppCompatActivity {
                     setFragment(friendFragment);
 //                    changeIconStateBar(R.id.navigation_pronounciation, R.drawable.navbar_play_on);
                     return true;
-//                case R.id.navigation_profile:
-//                    setFragment(battleFragment);
-////                    changeIconStateBar(R.id.navigation_multiplayer, R.drawable.navbar_battle_on);
-//                    return true;
+                case R.id.navigation_profile:
+                    setFragment(profileFragment);
+//                    changeIconStateBar(R.id.navigation_multiplayer, R.drawable.navbar_battle_on);
+                    return true;
             }
             return false;
         }
@@ -154,8 +165,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setOnlineUser();
-        tellOthersThatImFuckingOnline();
 
     }
 
@@ -170,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                        userModel = documentSnapshot.toObject(UserModel.class);
                         DocumentReference userRef = db.collection("online-users").document(userId);
                         if (userModel != null) {
                             userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {

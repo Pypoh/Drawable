@@ -14,10 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.NotifModel;
+import com.example.pypoh.drawable.Model.QuestionModel;
 import com.example.pypoh.drawable.Model.RoomModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,6 +32,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MatchingFragment extends Fragment {
@@ -40,10 +44,17 @@ public class MatchingFragment extends Fragment {
     private String friendUid;
 
     private String roomId;
+    QuestionModel questionModel = new QuestionModel();
+
+    ArrayList<String> questionFiltered = new ArrayList<>();
+
+    int playerCode;
+
 
     public MatchingFragment() {
         // Required empty public constructor
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,11 +64,11 @@ public class MatchingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_matching, container, false);
+        View view = inflater.inflate(R.layout.fragment_matching, container, false);
 
         NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (mNotificationManager != null){
+        if (mNotificationManager != null) {
             mNotificationManager.cancel(0);
         }
 
@@ -73,6 +84,8 @@ public class MatchingFragment extends Fragment {
 
         // Create Rooms
         Bundle bundle = getArguments();
+        assert bundle != null;
+        playerCode = bundle.getInt("STATUS_KEY");
         if (bundle != null) {
             int intentCode = bundle.getInt("STATUS_KEY");
             switch (intentCode) {
@@ -128,7 +141,10 @@ public class MatchingFragment extends Fragment {
                         if (notifModel1.getStatus() == 2) {
                             db.collection("room").document(roomId).update("battleTag_opponent", friendUid);
                             // Intent ke aktipiiti sebelah;
-                            ((MatchingActivity) getActivity()).setFragment(((MatchingActivity) getActivity()).acceptMatchingFragment, 0);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("PLAYER_KEY", playerCode);
+                            bundle.putStringArrayList("QUESTIONS_KEY", questionFiltered);
+                            ((MatchingActivity) getActivity()).setFragmentWithBundle(((MatchingActivity) getActivity()).acceptMatchingFragment, bundle);
                         } else if (notifModel1.getStatus() == 1) {
                             // nanti send notif juga
                             db.collection("room").document(roomId).delete();
@@ -146,7 +162,45 @@ public class MatchingFragment extends Fragment {
 
         roomId = db.collection("room").document().getId();
         db.collection("room").document(roomId).set(roomModel);
+        divideQuestion(roomId);
 
+    }
 
+    private void divideQuestion(final String roomId) {
+        String uId = mAuth.getCurrentUser().getUid();
+        db.collection("question").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                    if (task.isSuccessful()) {
+                        ArrayList<String> a = new ArrayList<>();
+                        questionModel = documentSnapshot.toObject(QuestionModel.class);
+                        if (questionModel != null) {
+                            a.addAll(questionModel.getQuestionList());
+                        }
+                        Collections.shuffle(a);
+                        questionModel.setQuestionList(a);
+                    }
+                }
+                questionFiltered.clear();
+                for (int i = 0; i < 18; i++) {
+                    // disini dia ga dapet question modelnya
+                    questionFiltered.add(questionModel.getQuestionList().get(i));
+                }
+                db.collection("room").document(roomId).update("availableQuestion", questionFiltered).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("question", questionModel.getQuestionList().get(0));
+                        }
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Tidak ada data", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
