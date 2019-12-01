@@ -5,13 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,8 +19,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.pypoh.drawable.Adapter.FriendListAdapter;
-import com.example.pypoh.drawable.MainFragment.BattleFragment;
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.UserModel;
@@ -36,7 +34,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,14 +45,12 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class FriendFragment extends Fragment {
 
+    public static FriendListAdapter mAdapter;
     private Button btn_add;
     private EditText et_battleTag;
     private ImageView iv_close, iv_add_friend;
-
     private TextView tv_nama, tv_battletag, tv_matches, tv_win, tv_loss;
     private Button btn_remove, btn_add_to_battle;
     private FirebaseAuth auth;
@@ -63,7 +58,6 @@ public class FriendFragment extends Fragment {
     private FirebaseFirestore db;
     private ImageView bt_checker;
     private RecyclerView recyclerView;
-    public static FriendListAdapter mAdapter;
     private FriendModel friendModel;
     private UserModel userModel;
     private String friendUid;
@@ -138,11 +132,8 @@ public class FriendFragment extends Fragment {
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertFriendData();
-                customDialog.dismiss();
-                et_battleTag.setText("");
-                bt_checker.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(), "Berhasil menambahkan teman", Toast.LENGTH_SHORT).show();
+                insertFriendData(customDialog);
+
             }
         });
 
@@ -158,6 +149,7 @@ public class FriendFragment extends Fragment {
                 bt_checker.setVisibility(View.INVISIBLE);
                 String battleTag = et_battleTag.getText().toString();
                 searchBattleTag(battleTag);
+                Log.d("IDFriendB", battleTag);
             }
 
             @Override
@@ -239,29 +231,39 @@ public class FriendFragment extends Fragment {
     }
 
     private void searchBattleTag(final String battleTag) {
+        Log.d("UserBattleTag", " " + battleTag);
+//        Log.d("friendsData", " "+ friendsData.get(0).getBattletag());
         final String userId = auth.getCurrentUser().getUid();
         final Handler handler;
+//        friendsData.clear();
         db.collection("users").whereEqualTo("battleTag", battleTag).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 for (DocumentSnapshot doc : task.getResult()) {
                     friendUid = doc.getId();
+                    Log.d("IDFriendBattleTag", " " + friendUid);
+                    Log.d("IDUser", " " + userId);
+//                    Log.d("")
                     if (!userId.equals(friendUid)) {
-                        for (FriendModel friend : friendsData) {
-                            if (!battleTag.equals(friend.getBattletag())) {
-
-                                friendModel = doc.toObject(FriendModel.class);
-                                bt_checker.setVisibility(View.VISIBLE);
-                                btn_add.setEnabled(true);
-                            } else {
-                                bt_checker.setVisibility(View.INVISIBLE);
-                                btn_add.setEnabled(false);
-                                Toast.makeText(getContext(), friend.getName() + " Telah berteman", Toast.LENGTH_SHORT).show();
-
+                        if (friendsData.isEmpty()) {
+                            friendModel = doc.toObject(FriendModel.class);
+                            bt_checker.setVisibility(View.VISIBLE);
+                            btn_add.setEnabled(true);
+                        } else {
+                            for (FriendModel friend : friendsData) {
+                                if (!battleTag.equals(friend.getBattletag())) {
+                                    friendModel = doc.toObject(FriendModel.class);
+                                    bt_checker.setVisibility(View.VISIBLE);
+                                    btn_add.setEnabled(true);
+                                } else {
+                                    bt_checker.setVisibility(View.INVISIBLE);
+                                    btn_add.setEnabled(false);
+                                    Toast.makeText(getContext(), friend.getName() + " Telah berteman", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
-
                     } else {
+                        friendModel = doc.toObject(FriendModel.class);
                         bt_checker.setVisibility(View.INVISIBLE);
                         Toast.makeText(getContext(), "Datamu Sendiri", Toast.LENGTH_SHORT).show();
                     }
@@ -331,12 +333,16 @@ public class FriendFragment extends Fragment {
 
     }
 
-    private void insertFriendData() {
+    private void insertFriendData(Dialog customDialog) {
         try {
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             Log.d("insertFriendID", friendUid + "");
             db.collection("users").document(userId).collection("friend").document(friendUid).set(friendModel);
             db.collection("users").document(friendUid).collection("friend").document(userId).set(userModel);
+            customDialog.dismiss();
+            et_battleTag.setText("");
+            bt_checker.setVisibility(View.INVISIBLE);
+            Toast.makeText(getContext(), "Berhasil menambahkan teman", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("failedToInsert", e.getMessage());
         }
@@ -351,7 +357,7 @@ public class FriendFragment extends Fragment {
                 for (DocumentSnapshot doc : task.getResult()) {
                     friendUid = doc.getId();
                     Log.d("friendid", friendUid);
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         CollectionReference friendRef = db.collection("online-users");
                         friendRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
