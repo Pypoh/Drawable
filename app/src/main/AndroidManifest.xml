@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Matchmaking.MatchingActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar.Material"></activity>
         <activity
             android:name=".Auth.AuthActivity"
             android:theme="@style/AppTheme.NoActionBar" />

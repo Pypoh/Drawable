@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,18 +20,39 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private Intent intent;
     private FirebaseUser mUser;
     private FirebaseFirestore db;
     private String userId;
     private List<String> allFriend = new ArrayList<>();
+
+    private UserModel userModel;
+
+    Handler getUserHandler = new Handler();
+
+    Runnable getUserRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (userModel == null) {
+                getOnlineUser();
+            }
+        }
+    };
+
+    Runnable checkData = new Runnable() {
+        @Override
+        public void run() {
+            getUserData();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +61,8 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        getUserHandler.post(getUserRunnable);
 
         new Thread(new Runnable() {
             @Override
@@ -50,18 +74,46 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }
                 if (mAuth.getCurrentUser() != null) {
                     mUser = mAuth.getCurrentUser();
-                    intent = new Intent(getApplicationContext(), MainActivity.class);
 //                    setOnlineUser();
+                    getUserData();
                 } else {
-                    intent = new Intent(getApplicationContext(), AuthActivity.class);
+                    toAuth();
                 }
-                startActivity(intent);
-                finish();
+
             }
         }).start();
     }
 
-    /*private void setOnlineUser() {
+    private void toAuth() {
+        Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void toMain() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        Gson objectData = new Gson();
+        String userData = objectData.toJson(userModel);
+        intent.putExtra("USERDATA", userData);
+        startActivity(intent);
+        finish();
+    }
+
+    private void getUserData() {
+        if (userModel == null) {
+            // ini yang belum dapet
+            getUserHandler.removeCallbacks(getUserRunnable);
+            getUserHandler.post(getUserRunnable);
+            getUserHandler.postDelayed(checkData, 1000);
+            return;
+        } else {
+            // ini yang udah dapet
+            getUserHandler.removeCallbacks(getUserRunnable);
+            toMain();
+        }
+    }
+
+    private void getOnlineUser() {
         userId = mAuth.getCurrentUser().getUid();
         Log.d("userIdDebug", userId + " ");
 
@@ -72,27 +124,14 @@ public class SplashScreenActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        UserModel userModel = documentSnapshot.toObject(UserModel.class);
-                        DocumentReference userRef = db.collection("online-users").document(userId);
-                        if (userModel != null) {
-                            userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d("setOnlineSuccess", "User online!");
-                                    }
-                                }
-                            });
-                        } else {
-                            Log.d("setOnlineError", "Failed to find user");
-                        }
+                        userModel = documentSnapshot.toObject(UserModel.class);
                     }
                 } else {
-                    Toast.makeText(SplashScreenActivity.this, "Failed get user data", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Failed get user data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-    }*/
+    }
 
     @Override
     protected void onResume() {

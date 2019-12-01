@@ -25,9 +25,11 @@ import android.widget.Toast;
 
 import com.example.pypoh.drawable.Adapter.FriendListAdapter;
 import com.example.pypoh.drawable.Adapter.ModeAdapter;
+import com.example.pypoh.drawable.MainActivity;
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.ModeModel;
+import com.example.pypoh.drawable.Model.UserModel;
 import com.example.pypoh.drawable.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -40,6 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator2;
 
@@ -53,6 +56,8 @@ public class BattleFragment extends Fragment {
     private FirebaseFirestore db;
     private List<FriendModel> friendsData = new ArrayList<>();
     private FriendListAdapter mAdapter;
+    private TextView username, level;
+    private UserModel userModel;
 
     // Circle Indicator Utils
     PagerSnapHelper pagerSnapHelper;
@@ -89,6 +94,11 @@ public class BattleFragment extends Fragment {
 
         indicator = view.findViewById(R.id.modes_indicator);
 
+        username = view.findViewById(R.id.text_user_name);
+        level = view.findViewById(R.id.text_user_level);
+
+
+
 
         return view;
     }
@@ -106,6 +116,9 @@ public class BattleFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
+        userModel = ((MainActivity)(getActivity())).getUserModel();
+
+
         // Setup RecyclerView
         recyclerViewMode.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         modeAdapter = new ModeAdapter(getContext(), modeData);
@@ -120,8 +133,22 @@ public class BattleFragment extends Fragment {
         pagerSnapHelper.attachToRecyclerView(recyclerViewMode);
         indicator.attachToRecyclerView(recyclerViewMode, pagerSnapHelper);
 
+        setView();
 
 
+    }
+
+    private void setView() {
+        username.setText(userModel.getBattleTag());
+        if (userModel.getLevel() == 0){
+            level.setText("Newbie");
+        } else if (userModel.getLevel() > 3){
+            level.setText("Elite");
+        } else if(userModel.getLevel() > 5){
+            level.setText("Pro");
+        } else {
+            level.setText("Master");
+        }
     }
 
     private void showOpponentDialog() {

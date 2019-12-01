@@ -49,7 +49,7 @@ public class FriendFragment extends Fragment {
 
     public static FriendListAdapter mAdapter;
     private Button btn_add;
-    private EditText et_battleTag;
+    private EditText et_battleTag, et_search_name;
     private ImageView iv_close, iv_add_friend;
     private TextView tv_nama, tv_battletag, tv_matches, tv_win, tv_loss;
     private Button btn_remove, btn_add_to_battle;
@@ -81,6 +81,31 @@ public class FriendFragment extends Fragment {
         imageStorage = FirebaseStorage.getInstance().getReference();
         initViews(view);
         recyclerView = view.findViewById(R.id.recycler_friend);
+
+        et_search_name = view.findViewById(R.id.search_friend);
+        et_search_name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                String nama = et_search_name.getText().toString();
+                if (!charSequence.equals("")) {
+                    searchName(charSequence.toString());
+                } else {
+                    mAdapter.setFriend(friendsData);
+                    mAdapter.notifyDataSetChanged();
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         // Inflate the layout for this fragment
         return view;
@@ -147,9 +172,11 @@ public class FriendFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 bt_checker.setVisibility(View.INVISIBLE);
-                String battleTag = et_battleTag.getText().toString();
-                searchBattleTag(battleTag);
-                Log.d("IDFriendB", battleTag);
+                if (!charSequence.equals("")) {
+                    searchBattleTag(charSequence.toString());
+                    Log.d("IDFriendB", charSequence.toString());
+                }
+
             }
 
             @Override
@@ -230,6 +257,26 @@ public class FriendFragment extends Fragment {
         customDialog.show();
     }
 
+    public void searchName(String nama) {
+        List<FriendModel> friends = new ArrayList<>();
+        for (FriendModel friend : friendsData) {
+            if (friend.getName().contains(nama)) {
+                friends.add(friend);
+//                FriendListAdapter list = new FriendListAdapter(getContext(), friends);
+//                list.setOnItemClickListener(new FriendListAdapter.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(FriendModel friendModel) {
+//                        initProfileDialog(friendModel);
+//                    }
+//                });
+//                recyclerView.setAdapter(list);
+            }
+
+        }
+        mAdapter.setFriend(friends);
+        mAdapter.notifyDataSetChanged();
+    }
+
     private void searchBattleTag(final String battleTag) {
         Log.d("UserBattleTag", " " + battleTag);
 //        Log.d("friendsData", " "+ friendsData.get(0).getBattletag());
@@ -298,6 +345,7 @@ public class FriendFragment extends Fragment {
             }
         });
         recyclerView.setAdapter(mAdapter);
+
     }
 
     private void getMyData() {

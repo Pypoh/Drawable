@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -37,6 +38,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,15 +112,20 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         mUser = mAuth.getCurrentUser();
-
         bottomMenu = navView.getMenu();
 
-        setFragment(battleFragment);
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            Gson objectJson = new Gson();
+            userModel = objectJson.fromJson(bundle.getString("USERDATA"), UserModel.class);
+            Log.d("getDataUserDebug", userModel.getName());
+        }
 
         checkNotification();
-
         setOnlineUser();
         tellOthersThatImFuckingOnline();
+
+        setFragment(battleFragment);
     }
 
 //    private void changeIconStateBar(int pathItem, int pathIcon) {
@@ -182,7 +189,10 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        userModel = documentSnapshot.toObject(UserModel.class);
+                        if (userModel == null) {
+                            userModel = documentSnapshot.toObject(UserModel.class);
+                            setUserModel(userModel);
+                        }
                         DocumentReference userRef = db.collection("online-users").document(userId);
                         if (userModel != null) {
                             userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
