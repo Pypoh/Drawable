@@ -44,6 +44,7 @@ public class MatchingFragment extends Fragment {
     RoomModel roomModel = new RoomModel();
     private String friendUid;
 
+
     private String roomId;
     QuestionModel questionModel = new QuestionModel();
 
@@ -53,6 +54,13 @@ public class MatchingFragment extends Fragment {
 
     List<NotifModel> listNotification = new ArrayList<>();
 
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
 
     public MatchingFragment() {
         // Required empty public constructor
@@ -181,7 +189,7 @@ public class MatchingFragment extends Fragment {
                         if (notifModel1 != null) {
                             if (notifModel1.getStatus() == 2) {
                                 // Intent ke aktipiiti sebelah;
-                                String roomId = notifModel1.getRoomId();
+                                roomId = notifModel1.getRoomId();
                                 setQuestionForInvitedPerson(roomId);
                             } else if (notifModel1.getStatus() == 1) {
                                 // state gagal

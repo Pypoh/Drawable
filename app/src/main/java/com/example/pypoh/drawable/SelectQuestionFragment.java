@@ -1,7 +1,5 @@
 package com.example.pypoh.drawable;
 
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -9,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,11 +19,14 @@ import com.example.pypoh.drawable.Adapter.OptionsAdapter;
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.OptionModel;
 import com.example.pypoh.drawable.Model.QuestionModel;
+import com.example.pypoh.drawable.Model.TempModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +36,22 @@ public class SelectQuestionFragment extends Fragment {
     private RecyclerView recyclerViewOptions;
     private OptionsAdapter optionsAdapter;
 
-    private QuestionModel questionModel;
+    private MatchingFragment matchingFragment = new MatchingFragment();
     private static OptionsAdapter mAdapter;
 
+    QuestionModel questionModel = new QuestionModel();
+
     private ArrayList<String> questionsData = new ArrayList<>();
+    private ArrayList<String> selectedQuestions = new ArrayList<>();
     ChipGroup chipGroup;
+    TempModel tempModel = new TempModel();
 
     private ArrayList<OptionModel> playerOneQuestion = new ArrayList<>();
     private ArrayList<OptionModel> playerTwoQuestion = new ArrayList<>();
 
-    private ArrayList<String> selectedQuestions = new ArrayList<>();
+    private int playerCode;
 
-    int playerCode;
+    private String roomId;
 
     Button ready;
 
@@ -80,6 +86,12 @@ public class SelectQuestionFragment extends Fragment {
 
 //        mAdapter = new OptionsAdapter(getContext(),questionsData);
         Bundle bundle = getArguments();
+
+        roomId = bundle.getString("ROOM_KEY");
+        playerCode = bundle.getInt("PLAYER_KEY");
+        Log.d("roomId", roomId);
+        Log.d("playerCode", String.valueOf(playerCode));
+
 
         recyclerViewOptions.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
@@ -147,30 +159,50 @@ public class SelectQuestionFragment extends Fragment {
 
         recyclerViewOptions.setAdapter(optionsAdapter);
 
-        final int key = 1;
+
         ready.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 insertQuestion();
-                intentToBattle(key);
+                intentToBattle();
             }
         });
 
     }
 
-    private void intentToBattle(int key) {
-        ((MatchingActivity) getActivity()).setFragment(new CoundownFragment(), key);
+    private void intentToBattle() {
+        Bundle bundle = new Bundle();
+        bundle.putString("ROOM_KEY", roomId);
+        bundle.putInt("PLAYER_KEY", playerCode);
+        questionModel = null;
+        ((MatchingActivity) getActivity()).setFragmentWithBundle(new CoundownFragment(), bundle);
     }
 
     private void insertQuestion() {
-        db.collection("room").document().update("question", questionModel.getQuestionList()).addOnCompleteListener(new OnCompleteListener<Void>() {
+        /*WriteBatch batch = db.batch();
+        DocumentReference col = db.collection("room").document(roomId).collection("question").document();*/
+        for (int i = 0; i < selectedQuestions.size(); i++) {
+            Log.d("arraySize", String.valueOf(selectedQuestions.size()));
+            tempModel.setQuestion(questionModel.getQuestionList().get(i));
+            db.collection("room").document(roomId).collection("question").document().set(tempModel).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()) {
+//                        Toast.makeText(getContext(), "Question successful inserted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            /*batch.set(col, tempModel);
+            batch.set(col, questionModel);*/
+
+        }
+        /*batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Log.d("halo_key", "huhu");
+                if (task.isSuccessful()) {
                 }
             }
-        });
+        });*/
     }
 
     public void addChips(final String question) {
@@ -185,6 +217,7 @@ public class SelectQuestionFragment extends Fragment {
 //        chip.setBackgroundColor(getContext().getResources().getColor(R.color.colorPrimary));
 //        chip.setTextColor(getContext().getResources().getColor(R.color.white));
         selectedQuestions.add(question);
+        questionModel = new QuestionModel(selectedQuestions);
         chipGroup.addView(chip);
     }
 

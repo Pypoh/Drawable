@@ -31,6 +31,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
+import java.util.Random;
 
 
 public class RegisterFragment extends Fragment {
@@ -224,6 +225,7 @@ public class RegisterFragment extends Fragment {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DocumentReference userRef = db.collection("users").document(userId);
+
         String numBattleTag = userId.substring(0 , 4);
         String name = battleTag;
 
