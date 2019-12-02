@@ -14,8 +14,11 @@ public class RoomModel {
     private int score_host;
     @SerializedName("score_opponent")
     private int score_opponent;
+    @SerializedName("host_ready")
+    private boolean host_ready;
+    @SerializedName("opponent_ready")
+    private boolean opponent_ready;
 
-    private List<String> question = new ArrayList<>();
     private List<String> availableQuestion = new ArrayList<>();
 
     public RoomModel(String battleTag_host, String battleTag_opponent, int score_host, int score_opponent) {
@@ -29,12 +32,20 @@ public class RoomModel {
 
     }
 
-    public List<String> getQuestion() {
-        return question;
+    public boolean isHost_ready() {
+        return host_ready;
     }
 
-    public void setQuestion(List<String> question) {
-        this.question = question;
+    public void setHost_ready(boolean host_ready) {
+        this.host_ready = host_ready;
+    }
+
+    public boolean isOpponent_ready() {
+        return opponent_ready;
+    }
+
+    public void setOpponent_ready(boolean opponent_ready) {
+        this.opponent_ready = opponent_ready;
     }
 
     public List<String> getAvailableQuestion() {

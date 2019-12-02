@@ -14,20 +14,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.pypoh.drawable.Drawing.DrawingFragment;
 import com.example.pypoh.drawable.MainFragment.BattleFragment;
+import com.example.pypoh.drawable.MainFragment.FriendFragment;
+import com.example.pypoh.drawable.MainFragment.ProfileFragment;
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.Model.NotifModel;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_profile:
                     setFragment(profileFragment);
+//                    setFragment(new DrawingFragment());
 //                    changeIconStateBar(R.id.navigation_multiplayer, R.drawable.navbar_battle_on);
                     return true;
             }
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
         checkNotification();
         setOnlineUser();
-        tellOthersThatImFuckingOnline();
+        tellOthersThatImOnline();
 
         setFragment(battleFragment);
     }
@@ -155,8 +157,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        tellOthersThatImFuckingOffline();
-        setOfflineUser();
+        if (mAuth.getCurrentUser() != null) {
+            tellOthersThatImOffline();
+            setOfflineUser();
+        }
     }
 
     @Override
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (mAuth != null && db != null) {
             setOnlineUser();
-            tellOthersThatImFuckingOnline();
+            tellOthersThatImOnline();
         }
     }
 
@@ -228,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void tellOthersThatImFuckingOnline() {
+    private void tellOthersThatImOnline() {
         final String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -250,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void tellOthersThatImFuckingOffline() {
+    private void tellOthersThatImOffline() {
         final String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).collection("friend").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

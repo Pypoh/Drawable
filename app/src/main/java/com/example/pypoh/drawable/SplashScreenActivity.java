@@ -41,16 +41,9 @@ public class SplashScreenActivity extends AppCompatActivity {
     Runnable getUserRunnable = new Runnable() {
         @Override
         public void run() {
-            if (userModel == null) {
+            if (userModel == null && mAuth.getCurrentUser() != null) {
                 getOnlineUser();
             }
-        }
-    };
-
-    Runnable checkData = new Runnable() {
-        @Override
-        public void run() {
-            getUserData();
         }
     };
 
@@ -100,6 +93,12 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void getUserData() {
+        Runnable checkData = new Runnable() {
+            @Override
+            public void run() {
+                getUserData();
+            }
+        };
         if (userModel == null) {
             // ini yang belum dapet
             getUserHandler.removeCallbacks(getUserRunnable);

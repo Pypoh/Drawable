@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pypoh.drawable.MainActivity;
+import com.example.pypoh.drawable.Model.UserModel;
 import com.example.pypoh.drawable.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 public class LoginFragment extends Fragment {
 
@@ -36,6 +39,22 @@ public class LoginFragment extends Fragment {
     EditText editEmail;
     private FirebaseFirestore db;
     private Button loginBtn;
+
+    // Get User Data Utils
+    private UserModel userModel;
+    private String userId;
+
+    Handler getUserHandler = new Handler();
+
+    Runnable getUserRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (userModel == null && mAuth.getCurrentUser() != null) {
+                getOnlineUser();
+            }
+        }
+    };
+
 
     // Firebase
     private FirebaseAuth mAuth;
@@ -51,6 +70,8 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
         loginBtn = view.findViewById(R.id.button_login);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +147,7 @@ public class LoginFragment extends Fragment {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
 //                    getData();
-                    toMain();
+                    getUserData();
                 } else {
                     Toast.makeText(getContext(), "Fail", Toast.LENGTH_SHORT).show();
                     loginBtn.setEnabled(true);
@@ -138,7 +159,9 @@ public class LoginFragment extends Fragment {
 
     private void toMain() {
         Intent toMain = new Intent(getContext(), MainActivity.class);
-        toMain.putExtra("userId",mAuth.getCurrentUser().getUid());
+        Gson objectData = new Gson();
+        String userData = objectData.toJson(userModel);
+        toMain.putExtra("USERDATA", userData);
         startActivity(toMain);
         getActivity().finish();
     }
@@ -146,10 +169,53 @@ public class LoginFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
     }
+
+    private void getUserData() {
+//        Runnable checkData = new Runnable() {
+//            @Override
+//            public void run() {
+//                getUserData();
+//            }
+//        };
+        if (userModel == null) {
+            // ini yang belum dapet
+            getUserHandler.removeCallbacks(getUserRunnable);
+            getUserHandler.post(getUserRunnable);
+            getUserHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getUserData();
+                }
+            }, 1000);
+            return;
+        } else {
+            // ini yang udah dapet
+            getUserHandler.removeCallbacks(getUserRunnable);
+            toMain();
+        }
+    }
+
+    private void getOnlineUser() {
+        userId = mAuth.getCurrentUser().getUid();
+        Log.d("userIdDebug", userId + " ");
+
+        DocumentReference userBattleTag = db.collection("users").document(userId);
+        userBattleTag.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot != null) {
+                        userModel = documentSnapshot.toObject(UserModel.class);
+                    }
+                } else {
+//                    Toast.makeText(MainActivity.this, "Failed get user data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
     /*private void getData() {
         final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
