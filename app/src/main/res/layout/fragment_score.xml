@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ScoreFragment">
+    tools:context=".Score.ScoreFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -33,6 +33,7 @@
                     android:src="@color/semi_black" />
 
                 <TextView
+                    android:id="@+id/name_host"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -71,6 +72,7 @@
                     android:src="@color/semi_black" />
 
                 <TextView
+                    android:id="@+id/name_opponent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -137,14 +139,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyler_score"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
-            android:id="@+id/recyler_score"
-            app:layout_constraintBottom_toTopOf="@id/btn_exit"
             android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_exit"
             app:layout_constraintTop_toBottomOf="@id/layout_score"
-            />
+            app:layout_constraintVertical_bias="0.0"
+            tools:layout_editor_absoluteX="24dp" />
 
         <Button
             android:id="@+id/btn_exit"

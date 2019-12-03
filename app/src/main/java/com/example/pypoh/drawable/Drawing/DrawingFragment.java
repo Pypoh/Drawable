@@ -110,7 +110,7 @@ public class DrawingFragment extends Fragment {
         return view;
     }
 
-    public float getResult() {
+    public int getResult() {
         Bitmap sketch = paintView.getNormalizedBitmap(); // get resized bitmap
 
 //        showImage(paintView.scaleBitmap(40, sketch));
@@ -118,11 +118,18 @@ public class DrawingFragment extends Fragment {
         // create the result
         Result result = classifier.classify(sketch);
 
-        return result.getProbbability();
+        float resultFloat = result.getProbbability();
+
+        int resultInt = (int) (resultFloat*100);
+
+        return resultInt;
     }
 
     public Bitmap getBitmapResult() {
-        Bitmap sketch = paintView.getNormalizedBitmap();
+//        Bitmap sketch = paintView.getNormalizedBitmap();
+
+        Bitmap sketch = paintView.getmBitmap();
+//        showImage(sketch);
         return sketch;
     }
 

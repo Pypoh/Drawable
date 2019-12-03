@@ -3,21 +3,21 @@ package com.example.pypoh.drawable.Model;
 public class RoundModel {
     private String question;
     private int score_host, score_opponent;
-    private byte[] image_host, image_opponent;
+    private String image_host, image_opponent;
 
-    public byte[] getImage_host() {
+    public String getImage_host() {
         return image_host;
     }
 
-    public void setImage_host(byte[] image_host) {
+    public void setImage_host(String image_host) {
         this.image_host = image_host;
     }
 
-    public byte[] getImage_opponent() {
+    public String getImage_opponent() {
         return image_opponent;
     }
 
-    public void setImage_opponent(byte[] image_opponent) {
+    public void setImage_opponent(String image_opponent) {
         this.image_opponent = image_opponent;
     }
 

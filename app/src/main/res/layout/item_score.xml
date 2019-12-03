@@ -31,7 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@color/semi_black"
-
+                    android:scaleType="fitXY"
                     />
             </RelativeLayout>
 
@@ -62,9 +62,10 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/nameQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="VS"
+            android:text="Ear"
             android:textColor="@color/semi_black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -90,6 +91,7 @@
                 android:padding="2dp">
 
                 <ImageView
+                    android:scaleType="fitXY"
                     android:id="@+id/draw_opponent"
                     android:layout_width="96dp"
                     android:layout_height="96dp"

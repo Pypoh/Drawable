@@ -155,7 +155,7 @@ public class MatchingFragment extends Fragment {
                                     if (task.isSuccessful()) {
                                         DocumentSnapshot documentSnapshot = task.getResult();
                                         if (documentSnapshot != null) {
-                                            deleteNotification(friendUid);
+                                            deleteNotification(friendUid, roomId);
                                         }
                                     }
                                 }
@@ -164,7 +164,7 @@ public class MatchingFragment extends Fragment {
                         }
                     };
                     notificationHandler = new Handler();
-//                    notificationHandler.postDelayed(notificationRunnable, 10000);
+                    notificationHandler.postDelayed(notificationRunnable, 10000);
                 }
             }
         });
@@ -176,7 +176,7 @@ public class MatchingFragment extends Fragment {
                     NotifModel notifModel1 = documentSnapshot.toObject(NotifModel.class);
                     if (notifModel1 != null) {
                         if (notifModel1.getStatus() == 2) {
-//                            notificationHandler.removeCallbacks(notificationRunnable);
+                            notificationHandler.removeCallbacks(notificationRunnable);
                             db.collection("room").document(roomId).update("battleTag_opponent", friendUid);
                             // Intent ke aktipiiti sebelah;
                             Bundle bundle = new Bundle();
@@ -216,6 +216,16 @@ public class MatchingFragment extends Fragment {
         String uid = mAuth.getCurrentUser().getUid();
         try {
             db.collection("users").document(friendUid).collection("notification").document(uid).delete();
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void deleteNotification(String friendUid, String roomId) {
+        String uid = mAuth.getCurrentUser().getUid();
+        try {
+            db.collection("users").document(friendUid).collection("notification").document(uid).delete();
+            db.collection("room").document(roomId).delete();
         } catch (Exception e) {
 
         }

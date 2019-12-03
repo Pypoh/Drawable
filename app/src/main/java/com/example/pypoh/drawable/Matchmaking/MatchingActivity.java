@@ -77,7 +77,7 @@ public class MatchingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
 
         // tambahin delete notification
     }

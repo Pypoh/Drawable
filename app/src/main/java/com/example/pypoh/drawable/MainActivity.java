@@ -12,6 +12,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,8 +41,11 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,11 +99,7 @@ public class MainActivity extends AppCompatActivity {
                     changeIconStateBar(R.id.navigation_friend, R.drawable.navbar_multiplayer_on);
                     return true;
                 case R.id.navigation_profile:
-//                    setFragment(profileFragment);
-                    // intentnya buat debug
-                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    setFragment(profileFragment);
                     changeIconStateBar(R.id.navigation_profile, R.drawable.navbar_profile_on);
 //                    setFragment(new DrawingFragment());
                     return true;
@@ -116,11 +116,26 @@ public class MainActivity extends AppCompatActivity {
         bottomMenu.findItem(item).setIcon(icon);
     }
 
+    private void saveData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCES", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(userModel);
+        editor.putString("UserModel", json);
+        editor.apply();
+    }
+
+    private void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCES", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("UserModel", null);
+        userModel = gson.fromJson(json, UserModel.class);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -135,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             userModel = objectJson.fromJson(bundle.getString("USERDATA"), UserModel.class);
             Log.d("getDataUserDebug", userModel.getName());
         } else {
-            // get shared pref data
+            loadData();
         }
 
         checkNotification();
@@ -171,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        saveData();
 
         if (mAuth.getCurrentUser() != null) {
             tellOthersThatImOffline();
