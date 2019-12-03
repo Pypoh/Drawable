@@ -162,10 +162,10 @@ public class CoundownFragment extends Fragment {
         getQuestionList();
         deleteNotification();
 
-        new CountDownTimer(4000, 1000) {
+        new CountDownTimer(3000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                tv_countDown.setText(String.valueOf (millisUntilFinished / 1000));
+                tv_countDown.setText(String.valueOf (millisUntilFinished / 1000) + 1);
                 //here you can have your logic to set text to edittext
             }
 

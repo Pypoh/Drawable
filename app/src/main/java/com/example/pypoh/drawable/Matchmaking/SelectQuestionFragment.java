@@ -1,6 +1,7 @@
 package com.example.pypoh.drawable.Matchmaking;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -31,7 +32,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SelectQuestionFragment extends Fragment {
 
@@ -55,7 +55,7 @@ public class SelectQuestionFragment extends Fragment {
 
     private String roomId;
 
-    Button ready;
+    private Button buttonReady;
 
     // Firebase
     private FirebaseFirestore db;
@@ -75,7 +75,7 @@ public class SelectQuestionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_select_question, container, false);
         chipGroup = view.findViewById(R.id.chip_group);
         recyclerViewOptions = view.findViewById(R.id.recycler_options);
-        ready = view.findViewById(R.id.button_ready);
+        buttonReady = view.findViewById(R.id.button_ready);
 
         return view;
     }
@@ -115,12 +115,14 @@ public class SelectQuestionFragment extends Fragment {
                 for (int i = 0; i < 9; i++) {
                     assert questionsData != null;
                     playerOneQuestion.add(new OptionModel(questionsData.get(i)));
+                    Log.d("PlayerOneQuestionDebug", " " + new OptionModel(questionsData.get(i)));
                 }
                 optionsAdapter = new OptionsAdapter(getContext(), playerOneQuestion);
                 break;
             case 1:
                 for (int i = 9; i < 18; i++) {
                     playerTwoQuestion.add(new OptionModel(questionsData.get(i)));
+                    Log.d("PlayerTwoQuestionDebug", " " + new OptionModel(questionsData.get(i)));
                 }
                 optionsAdapter = new OptionsAdapter(getContext(), playerTwoQuestion);
                 break;
@@ -161,19 +163,16 @@ public class SelectQuestionFragment extends Fragment {
 
         setupReadyListener();
 
-        ready.setOnClickListener(new View.OnClickListener() {
+        buttonReady.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ready.setEnabled(false);
+                buttonReady.setEnabled(false);
                 if (selectedQuestions.size() < 3) {
-                    ready.setEnabled(true);
+                    buttonReady.setEnabled(true);
                     Toast.makeText(getContext(), "Kurang pertanyaannya ya, tambahin", Toast.LENGTH_SHORT).show();
                 } else {
                     insertQuestion();
                 }
-
-//                // add listener for opponent to ready
-//                intentToBattle();
             }
         });
 
@@ -203,49 +202,48 @@ public class SelectQuestionFragment extends Fragment {
     }
 
     private void insertQuestion() {
-        /*WriteBatch batch = db.batch();
-        DocumentReference col = db.collection("room").document(roomId).collection("question").document();*/
         for (int i = 0; i < selectedQuestions.size(); i++) {
             Log.d("arraySize", String.valueOf(selectedQuestions.size()));
             roundModel.setQuestion(questionModel.getQuestionList().get(i));
+            final int finalI = i;
             db.collection("room").document(roomId).collection("question").document(roundModel.getQuestion()).set(roundModel).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
 //                        Toast.makeText(getContext(), "Question successful inserted", Toast.LENGTH_SHORT).show();
+                        if (finalI == selectedQuestions.size() - 1) {
+                            setReady();
+                        }
                     }
                 }
             });
-            /*batch.set(col, roundModel);
-            batch.set(col, questionModel);*/
-
         }
+    }
 
-        switch (playerCode) {
-            case 0:
-                db.collection("room").document(roomId).update("host_ready", true).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
-                    }
-                });
-                break;
-            case 1:
-                db.collection("room").document(roomId).update("opponent_ready", true).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
-                    }
-                });
-                break;
-        }
-        /*batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+    private void setReady() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
+            public void run() {
+                switch (playerCode) {
+                    case 0:
+                        db.collection("room").document(roomId).update("host_ready", true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                            }
+                        });
+                        break;
+                    case 1:
+                        db.collection("room").document(roomId).update("opponent_ready", true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                            }
+                        });
+                        break;
                 }
             }
-        });*/
+        }, 1000);
     }
 
     public void addChips(final String question) {
@@ -280,31 +278,6 @@ public class SelectQuestionFragment extends Fragment {
             }
         }
     }
-
-    private void setTag(final List<String> tagList) {
-        for (int i = 0; i < tagList.size(); i++) {
-            final String tagQuestion = tagList.get(i);
-            final Chip chip = new Chip(getContext());
-            int paddingDp = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 10,
-                    getResources().getDisplayMetrics()
-            );
-            chip.setPadding(paddingDp, paddingDp, paddingDp, paddingDp);
-            chip.setText(tagQuestion);
-            chip.setCloseIconResource(R.drawable.ic_close_black);
-            chip.setCloseIconEnabled(true);
-
-            chip.setOnCloseIconClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    tagList.remove(tagQuestion);
-                    chipGroup.removeView(chip);
-                }
-            });
-            chipGroup.addView(chip);
-        }
-    }
-
 
 }
 

@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         userId = mAuth.getCurrentUser().getUid();
         Log.d("userIdDebug", userId + " ");
 
-        DocumentReference userBattleTag = db.collection("users").document(userId);
+        final DocumentReference userBattleTag = db.collection("users").document(userId);
         userBattleTag.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         Log.d("setOnlineSuccess", "User online!");
+                                        userBattleTag.update("online", true);
                                     }
                                 }
                             });
@@ -216,16 +218,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     private void setOfflineUser() {
-        String userId = mAuth.getCurrentUser().getUid();
+        final String userId = mAuth.getCurrentUser().getUid();
         DocumentReference onlineUserRef = db.collection("online-users").document(userId);
         onlineUserRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Log.d("setOfflineUser", "User Offline!");
+                    db.collection("users").document(userId).update("online", false);
                 }
             }
         });
@@ -286,9 +290,7 @@ public class MainActivity extends AppCompatActivity {
                         if (notifModel != null) {
                             if (notifModel.getStatus() == 0) {
                                 pushNotification();
-
                             }
-
                         }
                         /*FriendModel friendModel = documentSnapshot.toObject(FriendModel.class);
                         if (friendModel.isOnline()) {
@@ -296,6 +298,9 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("testDebugFriendList", friendModel.getName());
                         }*/
                     }
+                } else {
+//                    Log.d("notificationDebug", "Notification Deleted");
+//                    mNotificationManager.cancelAll();
                 }
             }
         });
@@ -332,6 +337,12 @@ public class MainActivity extends AppCompatActivity {
         }
         assert mNotificationManager != null;
         mNotificationManager.notify(0 /* Request Code */, mBuilder.build());
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mNotificationManager.cancelAll();
+//            }
+//        }, 9000);
     }
 
 

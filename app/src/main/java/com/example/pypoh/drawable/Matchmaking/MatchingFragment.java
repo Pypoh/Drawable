@@ -2,10 +2,12 @@ package com.example.pypoh.drawable.Matchmaking;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -34,6 +36,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 public class MatchingFragment extends Fragment {
 
@@ -99,17 +103,16 @@ public class MatchingFragment extends Fragment {
             int intentCode = bundle.getInt("STATUS_KEY");
             switch (intentCode) {
                 case 0:
+                    try {
+                        searchBattleTag(((MatchingActivity) getActivity()).getOpponentBattleTag());
+                    } catch (Exception e) {
+                    }
                     createRoom();
                     break;
                 case 1:
                     updateNotificationData();
                     break;
             }
-        }
-
-        try {
-            searchBattleTag(((MatchingActivity) getActivity()).getOpponentBattleTag());
-        } catch (Exception e) {
         }
     }
 
@@ -131,7 +134,7 @@ public class MatchingFragment extends Fragment {
     }
 
     private void sendNotificationToOpponent(final String friendUid) {
-        String uid = mAuth.getCurrentUser().getUid();
+        final String uid = mAuth.getCurrentUser().getUid();
         final NotifModel notifModel = new NotifModel(uid, 0, roomId);
         Log.d("friendUIDNotif", friendUid);
         db.collection("users").document(friendUid).collection("notification").document(uid).set(notifModel).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -139,6 +142,35 @@ public class MatchingFragment extends Fragment {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Log.d("notifModel", String.valueOf(notifModel.getStatus()));
+                    // add thread
+                    new Thread(new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(10000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            db.collection("users").document(friendUid).collection("notification").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot documentSnapshot = task.getResult();
+                                        if (documentSnapshot != null) {
+                                            deleteNotification(friendUid);
+                                        }
+                                    }
+                                }
+                            });
+                            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Objects.requireNonNull(getActivity()).onBackPressed();
+                                }
+                            });
+                        }
+                    }).start();
                 }
             }
         });
@@ -155,6 +187,9 @@ public class MatchingFragment extends Fragment {
                             bundle.putInt("PLAYER_KEY", playerCode);
                             bundle.putStringArrayList("QUESTIONS_KEY", questionFiltered);
                             bundle.putString("ROOM_KEY", roomId);
+                            bundle.putString("FRIEND_ID", friendUid);
+                            Log.d("FriendIDDebug", " " + friendUid);
+                            deleteNotification(friendUid);
                             ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
                         } else if (notifModel1.getStatus() == 1) {
                             // nanti send notif juga
@@ -165,6 +200,24 @@ public class MatchingFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("friendUidDestroy", "Jalan Wes");
+        if (friendUid != null)
+            Log.d("friendUidDestroy", friendUid);
+        deleteNotification(friendUid);
+    }
+
+    private void deleteNotification(String friendUid) {
+        String uid = mAuth.getCurrentUser().getUid();
+        try {
+            db.collection("users").document(friendUid).collection("notification").document(uid).delete();
+        } catch (Exception e) {
+
+        }
     }
 
     private void createRoom() {
@@ -202,6 +255,7 @@ public class MatchingFragment extends Fragment {
                 }
             }
         });
+
         db.collection("users").document(uid).collection("notification").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -213,9 +267,14 @@ public class MatchingFragment extends Fragment {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                db.collection("users").document(uid).collection("notification").document(listNotification.get(0).getBattleTag()).update("status", 2);
+                                try {
+                                    db.collection("users").document(uid).collection("notification").document(listNotification.get(0).getBattleTag()).update("status", 2);
+                                } catch (Exception e) {
+                                    Toast.makeText(getContext(), "Room tidak ditemukan", Toast.LENGTH_SHORT).show();
+                                    getActivity().onBackPressed();
+                                }
                             }
-                        }, 2000);
+                        }, 1000);
                     } catch (Exception e) {
 
                     }
@@ -241,8 +300,8 @@ public class MatchingFragment extends Fragment {
                 }
                 questionFiltered.clear();
                 for (int i = 0; i < 18; i++) {
-                    // disini dia ga dapet question modelnya
                     questionFiltered.add(questionModel.getQuestionList().get(i));
+                    Log.d("QuestionModelDebg", " " + questionModel.getQuestionList().get(i));
                 }
                 db.collection("room").document(roomId).update("availableQuestion", questionFiltered).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

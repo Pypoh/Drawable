@@ -116,7 +116,16 @@ public class DrawingActivity extends AppCompatActivity {
         fragment.setArguments(bundle);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.main_frame_drawing, fragment, "MAIN_FRAGMENT");
-        ft.addToBackStack(null);
+//        ft.addToBackStack(null);
         ft.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+
+        // Disabled
+        Toast.makeText(this, "Gabisa balek kalo lagi maen", Toast.LENGTH_SHORT).show();
+
     }
 }

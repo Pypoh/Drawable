@@ -187,6 +187,8 @@ public class BattleFragment extends Fragment {
         RecyclerView recyclerViewFriends = friendListDialog.findViewById(R.id.recycler_battle_friend);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(getContext()));
         FriendListAdapter friendListAdapter = new FriendListAdapter(getContext(), friendsData);
+        recyclerViewFriends.setAdapter(friendListAdapter);
+        getData(friendListAdapter);
         friendListAdapter.setOnItemClickListener(new FriendListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(FriendModel friendModel) {
@@ -195,8 +197,6 @@ public class BattleFragment extends Fragment {
                     getActivity().startActivity(toMatching);
             }
         });
-        getData(friendListAdapter);
-        recyclerViewFriends.setAdapter(friendListAdapter);
         friendListDialog.show();
         Window window = friendListDialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -218,6 +218,7 @@ public class BattleFragment extends Fragment {
                     // Disini tambah data
                     friendsData.clear();
                     for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                        //Mengirim dan Memasukkan Semua Objek ke friendModel
                         FriendModel friendModel = documentSnapshot.toObject(FriendModel.class);
                         if (friendModel.isOnline()) {
                             friendsData.add(friendModel);

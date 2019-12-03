@@ -75,41 +75,10 @@ public class MatchingActivity extends AppCompatActivity {
         ft.commit();
     }
 
-//    private void divideQuestion(final String roomId) {
-//        String uId = mAuth.getCurrentUser().getUid();
-//        db.collection("question").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                for (DocumentSnapshot documentSnapshot : task.getResult()) {
-//                    if (task.isSuccessful()) {
-//                        ArrayList<String> a = new ArrayList<>();
-//                        questionModel = documentSnapshot.toObject(QuestionModel.class);
-//                        if (questionModel != null) {
-//                            a.addAll(questionModel.getQuestionList());
-//                        }
-//                        Collections.shuffle(a);
-//                        questionModel.setQuestionList(a);
-//                    }
-//                }
-//                questionFiltered.clear();
-//                for (int i = 0; i < 18; i++) {
-//                    // disini dia ga dapet question modelnya
-//                    questionFiltered.add(questionModel.getQuestionList().get(i));
-//                }
-//                db.collection("room").document(roomId).update("availableQuestion", questionFiltered).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()) {
-//                            Log.d("question", questionModel.getQuestionList().get(0));
-//                        }
-//                    }
-//                });
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Toast.makeText(MatchingActivity.this, "Tidak ada data", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // tambahin delete notification
+    }
 }
