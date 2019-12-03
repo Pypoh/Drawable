@@ -95,7 +95,11 @@ public class MainActivity extends AppCompatActivity {
                     changeIconStateBar(R.id.navigation_friend, R.drawable.navbar_multiplayer_on);
                     return true;
                 case R.id.navigation_profile:
-                    setFragment(profileFragment);
+//                    setFragment(profileFragment);
+                    // intentnya buat debug
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
                     changeIconStateBar(R.id.navigation_profile, R.drawable.navbar_profile_on);
 //                    setFragment(new DrawingFragment());
                     return true;
@@ -130,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
             Gson objectJson = new Gson();
             userModel = objectJson.fromJson(bundle.getString("USERDATA"), UserModel.class);
             Log.d("getDataUserDebug", userModel.getName());
+        } else {
+            // get shared pref data
         }
 
         checkNotification();
@@ -345,12 +351,12 @@ public class MainActivity extends AppCompatActivity {
         }
         assert mNotificationManager != null;
         mNotificationManager.notify(0 /* Request Code */, mBuilder.build());
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mNotificationManager.cancelAll();
-//            }
-//        }, 9000);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mNotificationManager.cancelAll();
+            }
+        }, 9000);
     }
 
 

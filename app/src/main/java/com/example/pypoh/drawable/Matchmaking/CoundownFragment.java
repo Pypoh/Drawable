@@ -148,6 +148,7 @@ public class CoundownFragment extends Fragment {
 
         // Start activity
         startActivity(toDrawingActivity);
+        getActivity().finish();
     }
 
     @Override
@@ -165,7 +166,7 @@ public class CoundownFragment extends Fragment {
         new CountDownTimer(3000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                tv_countDown.setText(String.valueOf (millisUntilFinished / 1000) + 1);
+                tv_countDown.setText(String.valueOf ((millisUntilFinished / 1000) + 1));
                 //here you can have your logic to set text to edittext
             }
 

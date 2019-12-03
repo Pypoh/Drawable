@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -12,12 +14,20 @@ import android.widget.Toast;
 
 import com.example.pypoh.drawable.Model.RoundModel;
 import com.example.pypoh.drawable.R;
+import com.example.pypoh.drawable.Score.LoadScoreFragment;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +40,9 @@ public class DrawingActivity extends AppCompatActivity {
     private int playerCode;
 
     private FirebaseFirestore db;
+    private FirebaseStorage storage;
+
+    private Uri downloadUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +50,7 @@ public class DrawingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drawing);
 
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
 
         // get data from past activity
         Bundle bundle = getIntent().getExtras();
@@ -79,6 +93,13 @@ public class DrawingActivity extends AppCompatActivity {
                                     uploadScore(drawingFragment, questionList.get(finalI));
                                 }
                             });
+                            if (i == questionList.size() - 1) {
+                                // disini dia udah nyentuh soal terakhir (udah selesai)
+                                Bundle bundleForResult = new Bundle();
+                                bundleForResult.putString("ROOM_KEY", roomId);
+                                LoadScoreFragment loadScoreFragment = new LoadScoreFragment();
+                                setFragmentWithBundle(loadScoreFragment, bundleForResult);
+                            }
                         }
                     } catch (Exception e) {
                         Log.d("exeptionQuestionChange", e.toString());
@@ -90,7 +111,14 @@ public class DrawingActivity extends AppCompatActivity {
         }
     }
 
-    private void uploadScore(DrawingFragment drawingFragment, String question) {
+    private void uploadScore(DrawingFragment drawingFragment, final String question) {
+        Bitmap bmp = drawingFragment.getBitmapResult();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        bmp.recycle();
+        final StorageReference roomStorage = storage.getReference().child(roomId);
+        UploadTask uploadTask = roomStorage.putBytes(byteArray);
         switch (playerCode) {
             case 0:
                 db.collection("room").document(roomId).collection("question").document(question).update("score_host", drawingFragment.getResult()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -99,6 +127,37 @@ public class DrawingActivity extends AppCompatActivity {
 
                     }
                 });
+
+                // upload image and update image_host
+                Task<Uri> urlTaskHost = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        // Continue with the task to get the download URL
+                        return roomStorage.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            downloadUri = task.getResult();
+                            db.collection("room").document(roomId).collection("question").document(question).update("image_host", downloadUri.toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                }
+                            });
+
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
+                    }
+                });
+
                 break;
             case 1:
                 db.collection("room").document(roomId).collection("question").document(question).update("score_opponent", drawingFragment.getResult()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -107,6 +166,36 @@ public class DrawingActivity extends AppCompatActivity {
 
                     }
                 });
+                // upload image and update image_host
+                Task<Uri> urlTaskOpponent = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        // Continue with the task to get the download URL
+                        return roomStorage.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            downloadUri = task.getResult();
+                            db.collection("room").document(roomId).collection("question").document(question).update("image_opponent", downloadUri.toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                }
+                            });
+
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
+                    }
+                });
+
                 break;
         }
     }

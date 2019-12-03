@@ -121,6 +121,11 @@ public class DrawingFragment extends Fragment {
         return result.getProbbability();
     }
 
+    public Bitmap getBitmapResult() {
+        Bitmap sketch = paintView.getNormalizedBitmap();
+        return sketch;
+    }
+
     // debug: ImageView with rescaled 28x28 bitmap
     private void showImage(Bitmap bitmap) {
         Dialog builder = new Dialog(getContext());

@@ -98,8 +98,6 @@ public class BattleFragment extends Fragment {
         level = view.findViewById(R.id.text_user_level);
 
 
-
-
         return view;
     }
 
@@ -116,7 +114,7 @@ public class BattleFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        userModel = ((MainActivity)(getActivity())).getUserModel();
+        userModel = ((MainActivity) (getActivity())).getUserModel();
 
 
         // Setup RecyclerView
@@ -144,13 +142,13 @@ public class BattleFragment extends Fragment {
 
     private void setView() {
         username.setText(userModel.getBattleTag());
-        if (userModel.getLevel() == 0){
+        if (userModel.getLevel() == 0) {
             level.setText("Newbie");
-        } else if (userModel.getLevel() > 5 && userModel.getLevel() <= 10){
+        } else if (userModel.getLevel() > 5 && userModel.getLevel() <= 10) {
             level.setText("Elite");
-        } else if(userModel.getLevel() > 10 && userModel.getLevel() <= 15){
+        } else if (userModel.getLevel() > 10 && userModel.getLevel() <= 15) {
             level.setText("Pro");
-        } else if(userModel.getLevel() > 15 && userModel.getLevel() <= 20){
+        } else if (userModel.getLevel() > 15 && userModel.getLevel() <= 20) {
             level.setText("Master");
         } else {
             level.setText("Developer");
@@ -199,8 +197,8 @@ public class BattleFragment extends Fragment {
             @Override
             public void onItemClick(FriendModel friendModel) {
                 Intent toMatching = new Intent(getContext(), MatchingActivity.class);
-                    toMatching.putExtra("BATTLE_TAG_KEY", friendModel.getBattletag());
-                    getActivity().startActivity(toMatching);
+                toMatching.putExtra("BATTLE_TAG_KEY", friendModel.getBattletag());
+                getActivity().startActivity(toMatching);
             }
         });
         friendListDialog.show();

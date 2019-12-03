@@ -46,6 +46,9 @@ public class MatchingFragment extends Fragment {
     RoomModel roomModel = new RoomModel();
     private String friendUid;
 
+    private Thread notificationThread;
+    private Runnable notificationRunnable;
+    private Handler notificationHandler;
 
     private String roomId;
     QuestionModel questionModel = new QuestionModel();
@@ -143,15 +146,9 @@ public class MatchingFragment extends Fragment {
                 if (task.isSuccessful()) {
                     Log.d("notifModel", String.valueOf(notifModel.getStatus()));
                     // add thread
-                    new Thread(new Runnable() {
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    notificationRunnable = new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                Thread.sleep(10000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
                             db.collection("users").document(friendUid).collection("notification").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -163,24 +160,23 @@ public class MatchingFragment extends Fragment {
                                     }
                                 }
                             });
-                            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Objects.requireNonNull(getActivity()).onBackPressed();
-                                }
-                            });
+                            getActivity().finish();
                         }
-                    }).start();
+                    };
+                    notificationHandler = new Handler();
+//                    notificationHandler.postDelayed(notificationRunnable, 10000);
                 }
             }
         });
         db.collection("users").document(friendUid).collection("notification").document(uid).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (documentSnapshot != null) {
                     NotifModel notifModel1 = documentSnapshot.toObject(NotifModel.class);
                     if (notifModel1 != null) {
                         if (notifModel1.getStatus() == 2) {
+//                            notificationHandler.removeCallbacks(notificationRunnable);
                             db.collection("room").document(roomId).update("battleTag_opponent", friendUid);
                             // Intent ke aktipiiti sebelah;
                             Bundle bundle = new Bundle();
@@ -190,7 +186,12 @@ public class MatchingFragment extends Fragment {
                             bundle.putString("FRIEND_ID", friendUid);
                             Log.d("FriendIDDebug", " " + friendUid);
                             deleteNotification(friendUid);
-                            ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
+                            try {
+                                ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
+
+                            } catch (NullPointerException ne) {
+                                Log.d("setFragmentBundleNull", ne.toString());
+                            }
                         } else if (notifModel1.getStatus() == 1) {
                             // nanti send notif juga
                             db.collection("room").document(roomId).delete();
@@ -316,7 +317,11 @@ public class MatchingFragment extends Fragment {
                 bundle.putInt("PLAYER_KEY", playerCode);
                 bundle.putStringArrayList("QUESTIONS_KEY", questionFiltered);
                 bundle.putString("ROOM_KEY", roomId);
-                ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
+                if ((MatchingActivity) getActivity() != null) {
+                    ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
+                } else {
+                    Log.d("getActivityDebug", "Activity is null");
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

@@ -40,9 +40,6 @@ public class AcceptMatchingFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_accept_matching, container, false);
         // Inflate the layout for this fragment
-        if(bundle != null){
-
-        }
 
         return view;
     }

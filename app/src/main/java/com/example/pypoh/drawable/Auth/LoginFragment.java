@@ -172,12 +172,6 @@ public class LoginFragment extends Fragment {
     }
 
     private void getUserData() {
-//        Runnable checkData = new Runnable() {
-//            @Override
-//            public void run() {
-//                getUserData();
-//            }
-//        };
         if (userModel == null) {
             // ini yang belum dapet
             getUserHandler.removeCallbacks(getUserRunnable);
