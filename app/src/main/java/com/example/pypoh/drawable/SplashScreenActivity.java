@@ -47,6 +47,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         }
     };
 
+    int timeoutCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,16 +101,23 @@ public class SplashScreenActivity extends AppCompatActivity {
                 getUserData();
             }
         };
-        if (userModel == null) {
-            // ini yang belum dapet
-            getUserHandler.removeCallbacks(getUserRunnable);
-            getUserHandler.post(getUserRunnable);
-            getUserHandler.postDelayed(checkData, 1000);
-            return;
+        if (timeoutCount < 5) {
+            if (userModel == null) {
+                // ini yang belum dapet
+                getUserHandler.removeCallbacks(getUserRunnable);
+                getUserHandler.post(getUserRunnable);
+                getUserHandler.postDelayed(checkData, 1000);
+                timeoutCount++;
+                return;
+            } else {
+                // ini yang udah dapet
+                getUserHandler.removeCallbacks(getUserRunnable);
+                toMain();
+            }
         } else {
-            // ini yang udah dapet
-            getUserHandler.removeCallbacks(getUserRunnable);
-            toMain();
+            Toast.makeText(this, "Login Timeout", Toast.LENGTH_SHORT).show();
+            mAuth.signOut();
+            toAuth();
         }
     }
 

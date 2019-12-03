@@ -125,7 +125,11 @@ public class BattleFragment extends Fragment {
         modeAdapter.setOnItemClickListener(new ModeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ModeModel modeModel) {
-                showOpponentDialog();
+                if (modeModel.getMode() == 0) {
+                    showOpponentDialog();
+                } else {
+                    Toast.makeText(getContext(), "Under Development", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         recyclerViewMode.setAdapter(modeAdapter);
@@ -142,12 +146,14 @@ public class BattleFragment extends Fragment {
         username.setText(userModel.getBattleTag());
         if (userModel.getLevel() == 0){
             level.setText("Newbie");
-        } else if (userModel.getLevel() > 3){
+        } else if (userModel.getLevel() > 5 && userModel.getLevel() <= 10){
             level.setText("Elite");
-        } else if(userModel.getLevel() > 5){
+        } else if(userModel.getLevel() > 10 && userModel.getLevel() <= 15){
             level.setText("Pro");
-        } else {
+        } else if(userModel.getLevel() > 15 && userModel.getLevel() <= 20){
             level.setText("Master");
+        } else {
+            level.setText("Developer");
         }
     }
 

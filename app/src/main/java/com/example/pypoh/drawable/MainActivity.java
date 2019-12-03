@@ -88,21 +88,29 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_battle:
                     setFragment(battleFragment);
-//                    changeIconStateBar(R.id.navigation_adventure, R.drawable.navbar_lesson_on);
+                    changeIconStateBar(R.id.navigation_battle, R.drawable.navbar_battle_on);
                     return true;
                 case R.id.navigation_friend:
                     setFragment(friendFragment);
-//                    changeIconStateBar(R.id.navigation_pronounciation, R.drawable.navbar_play_on);
+                    changeIconStateBar(R.id.navigation_friend, R.drawable.navbar_multiplayer_on);
                     return true;
                 case R.id.navigation_profile:
                     setFragment(profileFragment);
+                    changeIconStateBar(R.id.navigation_profile, R.drawable.navbar_profile_on);
 //                    setFragment(new DrawingFragment());
-//                    changeIconStateBar(R.id.navigation_multiplayer, R.drawable.navbar_battle_on);
                     return true;
             }
             return false;
         }
     };
+
+    private void changeIconStateBar(int item, int icon) {
+        bottomMenu.findItem(R.id.navigation_battle).setIcon(R.drawable.navbar_battle_off);
+        bottomMenu.findItem(R.id.navigation_friend).setIcon(R.drawable.navbar_multiplayer_off);
+        bottomMenu.findItem(R.id.navigation_profile).setIcon(R.drawable.navbar_profile_off);
+
+        bottomMenu.findItem(item).setIcon(icon);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

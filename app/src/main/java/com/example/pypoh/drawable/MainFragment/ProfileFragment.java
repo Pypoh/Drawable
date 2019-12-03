@@ -67,8 +67,9 @@ public class ProfileFragment extends Fragment {
 
     public void getMyData() {
         name.setText(userModel.getName());
-        level.setText(String.valueOf(userModel.getLevel()));
         battletag.setText(userModel.getBattleTag());
+        level.setText(String.valueOf(userModel.getLevel()));
+        setLevel();
         tv_matches.setText(String.valueOf(userModel.getMatches()));
         tv_win.setText(String.valueOf(userModel.getWin()));
         tv_loss.setText(String.valueOf(userModel.getLoss()));
@@ -78,6 +79,21 @@ public class ProfileFragment extends Fragment {
         Intent toAuthIntent = new Intent(getContext(), AuthActivity.class);
         startActivity(toAuthIntent);
         getActivity().finish();
+    }
+
+    private void setLevel() {
+        level.setText(userModel.getBattleTag());
+        if (userModel.getLevel() == 0){
+            level.setText("Newbie");
+        } else if (userModel.getLevel() > 5 && userModel.getLevel() <= 10){
+            level.setText("Elite");
+        } else if(userModel.getLevel() > 10 && userModel.getLevel() <= 15){
+            level.setText("Pro");
+        } else if(userModel.getLevel() > 15 && userModel.getLevel() <= 20){
+            level.setText("Master");
+        } else {
+            level.setText("Developer");
+        }
     }
 
 }

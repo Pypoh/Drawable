@@ -48,8 +48,7 @@
                     android:text=""
                     android:textColor="@color/text_auth"
                     android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"/>
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/text_user_level"

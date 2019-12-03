@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/navigation_battle"
-        android:icon="@color/semi_black"
+        android:icon="@drawable/navbar_battle_off"
         android:title="Battle" />
 
     <item
         android:id="@+id/navigation_friend"
-        android:icon="@color/semi_black"
+        android:icon="@drawable/navbar_multiplayer_off"
         android:title="Friend" />
 
     <item
         android:id="@+id/navigation_profile"
-        android:icon="@color/semi_black"
+        android:icon="@drawable/navbar_profile_off"
         android:title="Profile" />
 
 

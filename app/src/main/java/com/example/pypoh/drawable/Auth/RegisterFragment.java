@@ -1,5 +1,6 @@
 package com.example.pypoh.drawable.Auth;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -12,6 +13,7 @@ import android.os.Handler;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pypoh.drawable.MainActivity;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.example.pypoh.drawable.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,7 +31,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.util.Objects;
 import java.util.Random;
@@ -45,7 +50,21 @@ public class RegisterFragment extends Fragment {
     TextView textDummyHintRePass;
     EditText editRePass;
 
+    private String userId;
+    private UserModel userModel;
+
     private Button signUpBtn;
+
+    Handler getUserHandler = new Handler();
+
+    Runnable getUserRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (userModel == null && mAuth.getCurrentUser() != null) {
+                getOnlineUser();
+            }
+        }
+    };
 
     // Firebase
     private FirebaseAuth mAuth;
@@ -78,7 +97,7 @@ public class RegisterFragment extends Fragment {
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
                 for (int i = start; i < end; i++) {
                     if (!Character.isLetterOrDigit(source.charAt(i))) { // Accept only letter & digits ; otherwise just return
-                        Toast.makeText(getContext(),"Invalid Input",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Invalid Input", Toast.LENGTH_SHORT).show();
                         return "";
                     }
                 }
@@ -182,23 +201,23 @@ public class RegisterFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void signUp(String email, String password) {
-        if(TextUtils.isEmpty(editBattletag.getText().toString())){
+        if (TextUtils.isEmpty(editBattletag.getText().toString())) {
             Toast.makeText(getActivity(), "Please Enter Your Name...", Toast.LENGTH_SHORT).show();
             editBattletag.requestFocus();
             return;
         }
-        if(TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             Toast.makeText(getActivity(), "Please Enter Your Email...", Toast.LENGTH_SHORT).show();
             editEmail.requestFocus();
             return;
         }
 
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(getActivity(), "Please Enter Your Password...", Toast.LENGTH_SHORT).show();
             editPassword.requestFocus();
             return;
         }
-        if(!password.equals(editRePass.getText().toString())){
+        if (!password.equals(editRePass.getText().toString())) {
             Toast.makeText(getActivity(), "Password Not Matching...", Toast.LENGTH_SHORT).show();
             editRePass.requestFocus();
             return;
@@ -225,17 +244,19 @@ public class RegisterFragment extends Fragment {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DocumentReference userRef = db.collection("users").document(userId);
-
-        String numBattleTag = userId.substring(0 , 4);
+        Random random = new Random();
+        String numBattleTag = String.valueOf(random.nextInt(9999));
         String name = battleTag;
 
-        UserModel userModel = new UserModel(battleTag+"#"+numBattleTag, name, 0, 0, 0, 0, false);
+        UserModel userModel = new UserModel(battleTag + "#" + numBattleTag, name, 0, 0, 0, 0, false);
 
         userRef.set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(getContext(), "Inserted", Toast.LENGTH_SHORT).show();
+                    getUserData();
+
                 } else {
                     Toast.makeText(getContext(), "Fail Insert", Toast.LENGTH_SHORT).show();
                 }
@@ -251,5 +272,55 @@ public class RegisterFragment extends Fragment {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+    }
+
+    private void getOnlineUser() {
+        userId = mAuth.getCurrentUser().getUid();
+        Log.d("userIdDebug", userId + " ");
+
+        DocumentReference userBattleTag = db.collection("users").document(userId);
+        userBattleTag.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot != null) {
+                        userModel = documentSnapshot.toObject(UserModel.class);
+                    }
+                } else {
+//                    Toast.makeText(MainActivity.this, "Failed get user data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void getUserData() {
+        Runnable checkData = new Runnable() {
+            @Override
+            public void run() {
+                getUserData();
+            }
+        };
+        if (userModel == null) {
+            // ini yang belum dapet
+            getUserHandler.removeCallbacks(getUserRunnable);
+            getUserHandler.post(getUserRunnable);
+            getUserHandler.postDelayed(checkData, 1000);
+            return;
+        } else {
+            // ini yang udah dapet
+            getUserHandler.removeCallbacks(getUserRunnable);
+            toMain();
+        }
+
+    }
+
+    private void toMain() {
+        Intent toMain = new Intent(getContext(), MainActivity.class);
+        Gson objectData = new Gson();
+        String userData = objectData.toJson(userModel);
+        toMain.putExtra("USERDATA", userData);
+        startActivity(toMain);
+        getActivity().finish();
     }
 }

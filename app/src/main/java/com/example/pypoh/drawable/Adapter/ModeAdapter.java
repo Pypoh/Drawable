@@ -40,7 +40,22 @@ public class ModeAdapter extends RecyclerView.Adapter<ModeAdapter.ViewHolder> {
         holder.bind(modeModel, onItemClickListener);
 
         // Set Views
+
+
+        // Set Views
 //        holder.modeImage.setImageResource();
+        switch (modeModel.getMode()){
+            case 0:
+                holder.modeImage.setImageResource(R.drawable.mode1vs1new);
+                break;
+            case 1:
+                holder.modeImage.setImageResource(R.drawable.mode2vs2);
+                break;
+            case 2:
+                holder.modeImage.setImageResource(R.drawable.vbanyak);
+                break;
+        }
+
         holder.modeTitle.setText(modeModel.getName());
         holder.modeDesc.setText(modeModel.getDescription());
     }
