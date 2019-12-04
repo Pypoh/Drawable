@@ -123,9 +123,9 @@ public class FriendFragment extends Fragment {
                     return;
                 }
 
+                friendsData.clear();
                 if (queryDocumentSnapshots != null) {
                     // Disini tambah data
-                    friendsData.clear();
                     for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
                         FriendModel friendModel = documentSnapshot.toObject(FriendModel.class);
                         friendsData.add(friendModel);
@@ -134,6 +134,7 @@ public class FriendFragment extends Fragment {
 //                    System.out.println("Current data: " + queryDocumentSnapshots.getData());
                 } else {
                     System.out.print("Current data: null");
+                    mAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -219,7 +220,7 @@ public class FriendFragment extends Fragment {
         customDialog.setCancelable(true);
 
         tv_battletag = customDialog.findViewById(R.id.tv_bt_profile);
-        tv_battletag.setText(friendModel.getBattletag());
+        tv_battletag.setText(friendModel.getBattleTag());
         tv_nama = customDialog.findViewById(R.id.tv_nama_profile);
         tv_nama.setText(friendModel.getName());
         tv_matches = customDialog.findViewById(R.id.tv_profile_matches);
@@ -234,6 +235,7 @@ public class FriendFragment extends Fragment {
             public void onClick(View view) {
                 deleteFriendData(friendModel);
                 customDialog.dismiss();
+                mAdapter.notifyDataSetChanged();
             }
         });
         btn_add_to_battle = customDialog.findViewById(R.id.add_to_battle);
@@ -248,7 +250,7 @@ public class FriendFragment extends Fragment {
                     getContext().startActivity(toMatching);
                     customDialog.dismiss();
                 }*/
-                getDataOnline(friendModel.getBattletag());
+                getDataOnline(friendModel.getBattleTag());
                 /*else {
                     Toast.makeText(getContext(), friendModel.getName() + " sedang offline", Toast.LENGTH_SHORT).show();
                 }*/
@@ -299,7 +301,7 @@ public class FriendFragment extends Fragment {
                             btn_add.setEnabled(true);
                         } else {
                             for (FriendModel friend : friendsData) {
-                                if (!battleTag.equals(friend.getBattletag())) {
+                                if (!battleTag.equals(friend.getBattleTag())) {
                                     friendModel = doc.toObject(FriendModel.class);
                                     bt_checker.setVisibility(View.VISIBLE);
                                     btn_add.setEnabled(true);
@@ -364,7 +366,7 @@ public class FriendFragment extends Fragment {
         try {
             final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             Log.d("insertFriendID", friendUid + "");
-            String battleTag = friendModel.getBattletag();
+            String battleTag = friendModel.getBattleTag();
             db.collection("users").whereEqualTo("battleTag", battleTag).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -392,6 +394,7 @@ public class FriendFragment extends Fragment {
             et_battleTag.setText("");
             bt_checker.setVisibility(View.INVISIBLE);
             Toast.makeText(getContext(), "Berhasil menambahkan teman", Toast.LENGTH_SHORT).show();
+            mAdapter.notifyDataSetChanged();
         } catch (Exception e) {
             Log.e("failedToInsert", e.getMessage());
         }
@@ -429,6 +432,7 @@ public class FriendFragment extends Fragment {
                                     mAdapter.notifyDataSetChanged();
                                 } else {
                                     System.out.print("Current data: null");
+                                    mAdapter.notifyDataSetChanged();
                                 }
                             }
                         });

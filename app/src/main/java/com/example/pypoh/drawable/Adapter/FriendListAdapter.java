@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pypoh.drawable.Model.FriendModel;
 import com.example.pypoh.drawable.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.fr
         holder.bind(current,onItemClickListener);
         holder.tv_friends_name.setText(current.getName());
         holder.tv_friends_rank.setText(String.valueOf(current.getLevel()));
+        Picasso.get().load(current.getImage()).into(holder.civ_friends_pict);
         if (current.isOnline()) {
             holder.online_indicator.setVisibility(View.VISIBLE);
 

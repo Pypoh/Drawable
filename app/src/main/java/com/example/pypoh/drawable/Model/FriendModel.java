@@ -18,7 +18,24 @@ public class FriendModel {
     private int loss;
     @SerializedName("online")
     private boolean online;
+    @SerializedName("image")
+    private String image;
 
+    public String getBattleTag() {
+        return battleTag;
+    }
+
+    public void setBattleTag(String battleTag) {
+        this.battleTag = battleTag;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public int getMatches() {
         return matches;
@@ -71,14 +88,6 @@ public class FriendModel {
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    public String getBattletag() {
-        return battleTag;
-    }
-
-    public void setBattletag(String battletag) {
-        this.battleTag = battletag;
     }
 
     public boolean isOnline() {

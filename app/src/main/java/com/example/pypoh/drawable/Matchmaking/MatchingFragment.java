@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pypoh.drawable.Matchmaking.AcceptMatchingFragment;
@@ -22,6 +23,8 @@ import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.NotifModel;
 import com.example.pypoh.drawable.Model.QuestionModel;
 import com.example.pypoh.drawable.Model.RoomModel;
+import com.example.pypoh.drawable.Model.RoundModel;
+import com.example.pypoh.drawable.Model.UserModel;
 import com.example.pypoh.drawable.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -32,28 +35,40 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MatchingFragment extends Fragment {
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     RoomModel roomModel = new RoomModel();
-    private String friendUid;
+    private String friendUid, userId;
 
     private Thread notificationThread;
     private Runnable notificationRunnable;
     private Handler notificationHandler;
 
+    private TextView tv_host, tv_opponent;
+    private NotifModel notifModel;
+
     private String roomId;
+
+    private UserModel userModel;
     QuestionModel questionModel = new QuestionModel();
 
     ArrayList<String> questionFiltered = new ArrayList<>();
+    private CircleImageView civ_host, civ_opponent;
 
     int playerCode;
 
@@ -82,6 +97,11 @@ public class MatchingFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_matching, container, false);
 
+        civ_host = view.findViewById(R.id.civ_host);
+        civ_opponent = view.findViewById(R.id.civ_opponent);
+        tv_host = view.findViewById(R.id.host_name);
+        tv_opponent = view.findViewById(R.id.opponent_name);
+
         NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (mNotificationManager != null) {
@@ -98,9 +118,10 @@ public class MatchingFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
+        userId = mAuth.getCurrentUser().getUid();
+
         // Create Rooms
         Bundle bundle = getArguments();
-        assert bundle != null;
         playerCode = bundle.getInt("STATUS_KEY");
         if (bundle != null) {
             int intentCode = bundle.getInt("STATUS_KEY");
@@ -108,12 +129,38 @@ public class MatchingFragment extends Fragment {
                 case 0:
                     try {
                         searchBattleTag(((MatchingActivity) getActivity()).getOpponentBattleTag());
+                        String json = bundle.getString("PROFILE_DATA");
+                        String name = bundle.getString("NAME_FRIEND_KEY");
+                        String image = bundle.getString("PROFILE_PICTURE_FRIEND_KEY");
+                        Gson gson = new Gson();
+                        userModel = gson.fromJson(json, UserModel.class);
+                        if (name != null) {
+                            tv_opponent.setText(name);
+                        }
+                        if (image != null) {
+                            Picasso.get().load(image).into(civ_opponent);
+                        }
+                        if (userModel.getImage() != null) {
+                            Picasso.get().load(userModel.getImage()).into(civ_host);
+                        }
+                        if (userModel.getName() != null) {
+                            tv_host.setText(userModel.getName());
+                        }
                     } catch (Exception e) {
                     }
                     createRoom();
                     break;
                 case 1:
                     updateNotificationData();
+                    String json = bundle.getString("PROFILE_DATA");
+                    Gson gson = new Gson();
+                    userModel = gson.fromJson(json, UserModel.class);
+                    if (userModel.getImage() != null) {
+                        Picasso.get().load(userModel.getImage()).into(civ_opponent);
+                    }
+                    if (userModel.getName() != null) {
+                        tv_opponent.setText(userModel.getName());
+                    }
                     break;
             }
         }
@@ -250,10 +297,28 @@ public class MatchingFragment extends Fragment {
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         NotifModel notifModel1 = doc.toObject(NotifModel.class);
                         if (notifModel1 != null) {
+                            //
+                            db.collection("users").document(notifModel1.getBattleTag()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        String name = task.getResult().getString("name");
+                                        String image = task.getResult().getString("image");
+                                        if (name != null) {
+                                            tv_host.setText(name);
+                                        }
+                                        if (image != null) {
+                                            Picasso.get().load(image).into(civ_host);
+                                        }
+                                    }
+                                }
+                            });
+
                             if (notifModel1.getStatus() == 2) {
                                 // Intent ke aktipiiti sebelah;
                                 roomId = notifModel1.getRoomId();
                                 setQuestionForInvitedPerson(roomId);
+
                             } else if (notifModel1.getStatus() == 1) {
                                 // state gagal
 //                                ((MatchingActivity) getActivity()).setFragment(new AcceptMatchingFragment(), 0);
@@ -285,7 +350,7 @@ public class MatchingFragment extends Fragment {
                                     getActivity().onBackPressed();
                                 }
                             }
-                        }, 1000);
+                        }, 3000);
                     } catch (Exception e) {
 
                     }

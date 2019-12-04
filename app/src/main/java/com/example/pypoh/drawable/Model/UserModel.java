@@ -18,6 +18,8 @@ public class UserModel {
     private int loss;
     @SerializedName("online")
     private boolean online;
+    @SerializedName("image")
+    private String image;
 
     public UserModel(String battleTag, String name, int level, int matches, int win, int loss, boolean online) {
         this.battleTag = battleTag;
@@ -30,6 +32,14 @@ public class UserModel {
     }
     public UserModel() {
 
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getBattleTag() {

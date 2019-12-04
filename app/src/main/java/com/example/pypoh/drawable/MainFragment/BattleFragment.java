@@ -39,6 +39,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -197,7 +198,14 @@ public class BattleFragment extends Fragment {
             @Override
             public void onItemClick(FriendModel friendModel) {
                 Intent toMatching = new Intent(getContext(), MatchingActivity.class);
-                toMatching.putExtra("BATTLE_TAG_KEY", friendModel.getBattletag());
+                toMatching.putExtra("BATTLE_TAG_KEY", friendModel.getBattleTag());
+                toMatching.putExtra("PROFILE_PICTURE_FRIEND_KEY", friendModel.getImage());
+                toMatching.putExtra("NAME_FRIEND_KEY", friendModel.getName());
+                //add gson
+                Gson gson = new Gson();
+                String json = gson.toJson(userModel);
+                toMatching.putExtra("PROFILE_DATA", json);
+
                 getActivity().startActivity(toMatching);
             }
         });

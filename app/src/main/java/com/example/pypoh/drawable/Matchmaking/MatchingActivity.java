@@ -39,14 +39,10 @@ public class MatchingActivity extends AppCompatActivity {
         if (bundle != null) {
             opponentBattleTag = bundle.getString("BATTLE_TAG_KEY");
             status = bundle.getInt("STATUS_KEY");
-            checkStatus(status);
+            setFragmentWithBundle(matchingFragment, bundle);
         } else {
-            checkStatus(status);
+            setFragmentWithBundle(matchingFragment, bundle);
         }
-    }
-
-    private void checkStatus(int status) {
-        setFragment(matchingFragment, status);
     }
 
     public String getOpponentBattleTag() {

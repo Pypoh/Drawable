@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private FirebaseFirestore db;
-    private String userId;
+    private String userId, json;
     public static ArrayList<FriendModel> friend;
 
     // Utils
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCES", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(userModel);
+        json = gson.toJson(userModel);
         editor.putString("UserModel", json);
         editor.apply();
     }
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
             Gson objectJson = new Gson();
             userModel = objectJson.fromJson(bundle.getString("USERDATA"), UserModel.class);
             Log.d("getDataUserDebug", userModel.getName());
+            saveData();
         } else {
             loadData();
         }
@@ -339,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
     private void pushNotification() {
         Intent resultIntent = new Intent(this.getApplicationContext(), MatchingActivity.class);
         resultIntent.putExtra("STATUS_KEY", 1);
+        resultIntent.putExtra("PROFILE_DATA", json);
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this,
