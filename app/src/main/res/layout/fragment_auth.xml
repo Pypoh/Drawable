@@ -56,7 +56,7 @@
             android:id="@+id/auth_logo"
             android:layout_width="240dp"
             android:layout_height="240dp"
-            android:src="@drawable/logocoba"
+            android:src="@drawable/splash"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

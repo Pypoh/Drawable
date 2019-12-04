@@ -246,7 +246,7 @@ public class RegisterFragment extends Fragment {
 
         DocumentReference userRef = db.collection("users").document(userId);
         Random random = new Random();
-        String numBattleTag = String.valueOf(random.ints(10000, 100000));
+        String numBattleTag = String.valueOf(random.nextInt(10000));
         String name = battleTag;
 
         UserModel userModel = new UserModel(battleTag + "#" + numBattleTag, name, 0, 0, 0, 0, false);
