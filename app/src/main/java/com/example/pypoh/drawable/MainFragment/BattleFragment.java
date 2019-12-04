@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,11 +41,13 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.relex.circleindicator.CircleIndicator2;
 
 public class BattleFragment extends Fragment {
@@ -59,6 +62,8 @@ public class BattleFragment extends Fragment {
     private FriendListAdapter mAdapter;
     private TextView username, level;
     private UserModel userModel;
+    private CircleImageView civ_profile;
+    private ImageView level_icon;
 
     // Circle Indicator Utils
     PagerSnapHelper pagerSnapHelper;
@@ -97,6 +102,8 @@ public class BattleFragment extends Fragment {
 
         username = view.findViewById(R.id.text_user_name);
         level = view.findViewById(R.id.text_user_level);
+        civ_profile = view.findViewById(R.id.civ_profile);
+        level_icon = view.findViewById(R.id.level_icon);
 
 
         return view;
@@ -145,14 +152,22 @@ public class BattleFragment extends Fragment {
         username.setText(userModel.getBattleTag());
         if (userModel.getLevel() == 0) {
             level.setText("Newbie");
+            level_icon.setImageResource(R.drawable.pangkat_1);
         } else if (userModel.getLevel() > 5 && userModel.getLevel() <= 10) {
             level.setText("Elite");
+            level_icon.setImageResource(R.drawable.pangkat_2);
         } else if (userModel.getLevel() > 10 && userModel.getLevel() <= 15) {
             level.setText("Pro");
+            level_icon.setImageResource(R.drawable.pangkat_3);
         } else if (userModel.getLevel() > 15 && userModel.getLevel() <= 20) {
             level.setText("Master");
+            level_icon.setImageResource(R.drawable.crowns);
         } else {
             level.setText("Developer");
+            level_icon.setImageResource(R.drawable.java);
+        }
+        if (userModel.getImage() != null) {
+            Picasso.get().load(userModel.getImage()).into(civ_profile);
         }
     }
 

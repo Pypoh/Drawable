@@ -43,18 +43,22 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendFragment extends Fragment {
 
     public static FriendListAdapter mAdapter;
     private Button btn_add;
     private EditText et_battleTag, et_search_name;
-    private ImageView iv_close, iv_add_friend;
+    private ImageView iv_close, iv_add_friend, level_friend;
     private TextView tv_nama, tv_battletag, tv_matches, tv_win, tv_loss;
     private Button btn_remove, btn_add_to_battle;
+    private CircleImageView civ_friends_pict;
     private FirebaseAuth auth;
     private StorageReference imageStorage;
     private FirebaseFirestore db;
@@ -244,6 +248,22 @@ public class FriendFragment extends Fragment {
         tv_battletag.setText(friendModel.getBattleTag());
         tv_nama = customDialog.findViewById(R.id.tv_nama_profile);
         tv_nama.setText(friendModel.getName());
+        civ_friends_pict = customDialog.findViewById(R.id.iv_profile_pict);
+        if (friendModel.getImage() != null) {
+            Picasso.get().load(friendModel.getImage()).into(civ_friends_pict);
+        }
+        level_friend = customDialog.findViewById(R.id.dialog_level_friend);
+        if (friendModel.getLevel() == 0) {
+            level_friend.setImageResource(R.drawable.pangkat_1);
+        } else if (friendModel.getLevel() > 5 && friendModel.getLevel() <= 10) {
+            level_friend.setImageResource(R.drawable.pangkat_2);
+        } else if (friendModel.getLevel() > 10 && friendModel.getLevel() <= 15) {
+            level_friend.setImageResource(R.drawable.pangkat_3);
+        } else if (friendModel.getLevel() > 15 && friendModel.getLevel() <= 20) {
+            level_friend.setImageResource(R.drawable.crowns);
+        } else {
+            level_friend.setImageResource(R.drawable.java);
+        }
         tv_matches = customDialog.findViewById(R.id.tv_profile_matches);
         tv_matches.setText(String.valueOf(friendModel.getMatches()));
         tv_win = customDialog.findViewById(R.id.tv_profile_win);
@@ -279,6 +299,10 @@ public class FriendFragment extends Fragment {
             }
         });
         customDialog.show();
+    }
+
+    private void setLevelView() {
+
     }
 
     public void searchName(String nama) {

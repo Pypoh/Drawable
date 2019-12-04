@@ -240,12 +240,13 @@ public class RegisterFragment extends Fragment {
                 });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void insertUserData(String battleTag, String email) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DocumentReference userRef = db.collection("users").document(userId);
         Random random = new Random();
-        String numBattleTag = String.valueOf(random.nextInt(9999));
+        String numBattleTag = String.valueOf(random.ints(10000, 100000));
         String name = battleTag;
 
         UserModel userModel = new UserModel(battleTag + "#" + numBattleTag, name, 0, 0, 0, 0, false);
