@@ -18,12 +18,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pypoh.drawable.Matchmaking.AcceptMatchingFragment;
-import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
 import com.example.pypoh.drawable.Model.NotifModel;
 import com.example.pypoh.drawable.Model.QuestionModel;
 import com.example.pypoh.drawable.Model.RoomModel;
-import com.example.pypoh.drawable.Model.RoundModel;
 import com.example.pypoh.drawable.Model.UserModel;
 import com.example.pypoh.drawable.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,15 +33,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -60,6 +53,7 @@ public class MatchingFragment extends Fragment {
     private Handler notificationHandler;
 
     private TextView tv_host, tv_opponent;
+    private CircleImageView civ_host, civ_opponent;
     private NotifModel notifModel;
 
     private String roomId;
@@ -68,7 +62,6 @@ public class MatchingFragment extends Fragment {
     QuestionModel questionModel = new QuestionModel();
 
     ArrayList<String> questionFiltered = new ArrayList<>();
-    private CircleImageView civ_host, civ_opponent;
 
     int playerCode;
 
@@ -81,6 +74,9 @@ public class MatchingFragment extends Fragment {
     public void setRoomId(String roomId) {
         this.roomId = roomId;
     }
+
+    // host data
+    private String nameOpponent, imageOpponent, nameHost, imageHost;
 
     public MatchingFragment() {
         // Required empty public constructor
@@ -130,15 +126,15 @@ public class MatchingFragment extends Fragment {
                     try {
                         searchBattleTag(((MatchingActivity) getActivity()).getOpponentBattleTag());
                         String json = bundle.getString("PROFILE_DATA");
-                        String name = bundle.getString("NAME_FRIEND_KEY");
-                        String image = bundle.getString("PROFILE_PICTURE_FRIEND_KEY");
+                        nameOpponent = bundle.getString("NAME_FRIEND_KEY");
+                        imageOpponent = bundle.getString("PROFILE_PICTURE_FRIEND_KEY");
                         Gson gson = new Gson();
                         userModel = gson.fromJson(json, UserModel.class);
-                        if (name != null) {
-                            tv_opponent.setText(name);
+                        if (nameOpponent != null) {
+                            tv_opponent.setText(nameOpponent);
                         }
-                        if (image != null) {
-                            Picasso.get().load(image).into(civ_opponent);
+                        if (imageOpponent != null) {
+                            Picasso.get().load(imageOpponent).into(civ_opponent);
                         }
                         if (userModel.getImage() != null) {
                             Picasso.get().load(userModel.getImage()).into(civ_host);
@@ -223,6 +219,7 @@ public class MatchingFragment extends Fragment {
                     NotifModel notifModel1 = documentSnapshot.toObject(NotifModel.class);
                     if (notifModel1 != null) {
                         if (notifModel1.getStatus() == 2) {
+                            // sisi host
                             notificationHandler.removeCallbacks(notificationRunnable);
                             db.collection("room").document(roomId).update("battleTag_opponent", friendUid);
                             // Intent ke aktipiiti sebelah;
@@ -232,6 +229,13 @@ public class MatchingFragment extends Fragment {
                             bundle.putString("ROOM_KEY", roomId);
                             bundle.putString("FRIEND_ID", friendUid);
                             Log.d("FriendIDDebug", " " + friendUid);
+
+                            // add bundle for load data
+                            bundle.putString("HOST_NAME_KEY", userModel.getName());
+                            bundle.putString("HOST_IMAGE_KEY", userModel.getImage());
+                            bundle.putString("OPPONENT_NAME_KEY", nameOpponent);
+                            bundle.putString("OPPONENT_IMAGE_KEY", imageOpponent);
+
                             deleteNotification(friendUid);
                             try {
                                 ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
@@ -302,13 +306,13 @@ public class MatchingFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     if (task.isSuccessful()) {
-                                        String name = task.getResult().getString("name");
-                                        String image = task.getResult().getString("image");
-                                        if (name != null) {
-                                            tv_host.setText(name);
+                                        nameHost = task.getResult().getString("name");
+                                        imageHost = task.getResult().getString("image");
+                                        if (nameHost != null) {
+                                            tv_host.setText(nameHost);
                                         }
-                                        if (image != null) {
-                                            Picasso.get().load(image).into(civ_host);
+                                        if (imageHost != null) {
+                                            Picasso.get().load(imageHost).into(civ_host);
                                         }
                                     }
                                 }
@@ -392,6 +396,12 @@ public class MatchingFragment extends Fragment {
                 bundle.putInt("PLAYER_KEY", playerCode);
                 bundle.putStringArrayList("QUESTIONS_KEY", questionFiltered);
                 bundle.putString("ROOM_KEY", roomId);
+
+                // add data to load
+                bundle.putString("HOST_NAME_KEY", nameHost);
+                bundle.putString("HOST_IMAGE_KEY", imageHost);
+                bundle.putString("OPPONENT_NAME_KEY", userModel.getName());
+                bundle.putString("OPPONENT_IMAGE_KEY", userModel.getImage());
                 if ((MatchingActivity) getActivity() != null) {
                     ((MatchingActivity) getActivity()).setFragmentWithBundle(new AcceptMatchingFragment(), bundle);
                 } else {

@@ -18,6 +18,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="96dp"/>
         <TextView
+            android:id="@+id/tv_host"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="dummy_host"
@@ -47,6 +48,7 @@
             android:layout_marginTop="40dp"/>
 
         <TextView
+            android:id="@+id/tv_opponent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="dummy_host"

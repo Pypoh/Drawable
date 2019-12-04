@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.pypoh.drawable.Adapter.FriendListAdapter;
 import com.example.pypoh.drawable.Matchmaking.MatchingActivity;
@@ -63,6 +64,8 @@ public class FriendFragment extends Fragment {
     private UserModel userModel;
     private String friendUid;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     private List<FriendModel> friendsData = new ArrayList<>();
 
     public FriendFragment() {
@@ -78,6 +81,24 @@ public class FriendFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friend, container, false);
+
+        mSwipeRefreshLayout = view.findViewById(R.id.layout_swipe_friend);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+                Toast.makeText(getContext(), "Refreshing Friend List", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(false);
+
+                    }
+                }, 2000);
+            }
+        });
 
         imageStorage = FirebaseStorage.getInstance().getReference();
         initViews(view);
